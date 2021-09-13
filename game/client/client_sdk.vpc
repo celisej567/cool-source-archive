@@ -1,0 +1,42 @@
+//-----------------------------------------------------------------------------
+//	CLIENT_HL2MP.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		"..\.."
+$Macro GAMENAME 	"mod"
+
+$Include "$SRCDIR\game\client\client_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories		"$BASE;sdk;$SRCDIR\game\shared\sdk"
+		$PreprocessorDefinitions			"$BASE;SDK"
+	}
+}
+
+$Project "Client (HL2MP)"
+{
+	$Folder	"Source Files"
+	{
+		-$File	"$SRCDIR\game\shared\weapon_parse_default.cpp"
+
+		$Folder	"SDK"
+		{
+			$File	"sdk\clientmode_skeleton.cpp"
+			$File	"sdk\hud_weaponselection.cpp"
+			$File	"sdk\skeleton_fx.cpp"
+			$File	"sdk\skeleton_in_main.cpp"
+			$File	"sdk\skeleton_prediction.cpp"
+			$File	"sdk\vgui_rootpanel_skeleton.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_gamemovement.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_gamerules.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_parsers.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_player.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_usermessages.cpp"
+		}
+	}
+}

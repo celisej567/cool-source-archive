@@ -1,0 +1,40 @@
+//-----------------------------------------------------------------------------
+//	SERVER_HL2MP.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		"..\.."
+$Macro GAMENAME 	"mod"
+
+$Include "$SRCDIR\game\server\server_base.vpc"
+$Include "$SRCDIR\game\server\nav_mesh.vpc" [$SOURCESDK]
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\sdk;sdk"
+		$PreprocessorDefinitions		"$BASE;SDK"
+	}
+}
+
+$Project "Server (SDK)"
+{
+	$Folder	"Source Files"
+	{
+
+		$Folder	"SDK"
+		{
+			$File	"sdk\skeleton_client.cpp"
+			$File	"sdk\skeleton_eventlog.cpp"
+			$File	"sdk\skeleton_gameinterface.cpp"
+			$File	"sdk\skeleton_playermove.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_gamemovement.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_gamerules.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_parsers.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_player.cpp"
+			$File	"$SRCDIR\game\shared\sdk\skeleton_usermessages.cpp"
+		}
+	}
+}
