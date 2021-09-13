@@ -548,110 +548,79 @@ void UpdateDispBBoxes( model_t *pWorld, int nDisplacements )
 
 
 #include "tier0/memdbgoff.h"
-bool DispInfo_LoadDisplacements( model_t *pWorld, bool bRestoring )
+bool DispInfo_LoadDisplacements(model_t* pWorld, bool bRestoring)
 {
-	const MaterialSystem_SortInfo_t *pSortInfos = materialSortInfoArray;
+	MEM_ALLOC_CREDIT_("DispInfo_LoadDisplacements");
 
-	int nDisplacements = CMapLoadHelper::LumpSize( LUMP_DISPINFO ) / sizeof( ddispinfo_t );	
-	int nLuxels = CMapLoadHelper::LumpSize( LUMP_DISP_LIGHTMAP_ALPHAS );
-	int nSamplePositionBytes = CMapLoadHelper::LumpSize( LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS );
+	const MaterialSystem_SortInfo_t* pSortInfos = materialSortInfoArray;
+
+	int nDisplacements = CMapLoadHelper::LumpSize(LUMP_DISPINFO) / sizeof(ddispinfo_t);
 
 	// Setup the world's list of displacements.
-	if ( bRestoring )
+	if (bRestoring)
 	{
 		/* Breakpoint-able: */
 		if (pWorld->brush.pShared->numDispInfos != nDisplacements)
-		{ 
-			volatile int a = 0; a = a + 1; 
+		{
+			volatile int a = 0; a = a + 1;
 		}
 
-		if ( !pWorld->brush.pShared->numDispInfos && nDisplacements )
+		if (!pWorld->brush.pShared->numDispInfos && nDisplacements)
 		{
 			// Attempting to restore displacements before displacements got loaded
 			return false;
 		}
 
-		ErrorIfNot( 
+		ErrorIfNot(
 			pWorld->brush.pShared->numDispInfos == nDisplacements,
 			("DispInfo_LoadDisplacments: dispcounts (%d and %d) don't match.", pWorld->brush.pShared->numDispInfos, nDisplacements)
-			);
-
-		ErrorIfNot(
-			g_DispLMAlpha.Count() == nLuxels,
-			("DispInfo_LoadDisplacements: lightmap alpha counts (%d and %d) don't match.", g_DispLMAlpha.Count(), nLuxels)
-			);
+		);
 	}
 	else
 	{
 		// Create the displacements.
 		pWorld->brush.pShared->numDispInfos = nDisplacements;
-		pWorld->brush.pShared->hDispInfos = DispInfo_CreateArray( pWorld->brush.pShared->numDispInfos );
-
-		// Load lightmap alphas.
-		{
-		MEM_ALLOC_CREDIT();
-		g_DispLMAlpha.SetSize( nLuxels );
-		}
-		CMapLoadHelper lhDispLMAlphas( LUMP_DISP_LIGHTMAP_ALPHAS );
-		lhDispLMAlphas.LoadLumpData( 0, nLuxels, g_DispLMAlpha.Base() );
-	
-		// Load lightmap sample positions.
-		{
-		MEM_ALLOC_CREDIT();
-		g_DispLightmapSamplePositions.SetSize( nSamplePositionBytes );
-		}
-		CMapLoadHelper lhDispLMPositions( LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS );
-		lhDispLMPositions.LoadLumpData( 0, nSamplePositionBytes, g_DispLightmapSamplePositions.Base() );
+		pWorld->brush.pShared->hDispInfos = DispInfo_CreateArray(pWorld->brush.pShared->numDispInfos);
 	}
 
 	// Free old data.
-	DispInfo_ReleaseMaterialSystemObjects( pWorld );
-	
+	DispInfo_ReleaseMaterialSystemObjects(pWorld);
+
 	// load the displacement info structures into temporary space
 	// using temporary storage that is not the stack for compatibility with console stack
-#ifndef _X360
+#if 0 	// With large MAX_MAP_DISPINFO we always want to use heap to avoid a stack overflow on PC as well.
 	ddispinfo_t tempDisps[MAX_MAP_DISPINFO];
 #else
-	CUtlMemory< ddispinfo_t > m_DispInfoBuf( 0, MAX_MAP_DISPINFO );
-	ddispinfo_t *tempDisps = m_DispInfoBuf.Base();
+	CUtlMemory< ddispinfo_t > m_DispInfoBuf(0, MAX_MAP_DISPINFO);
+	ddispinfo_t* tempDisps = m_DispInfoBuf.Base();
 #endif
-	ErrorIfNot( 
+	ErrorIfNot(
 		nDisplacements <= MAX_MAP_DISPINFO,
 		("DispInfo_LoadDisplacements: nDisplacements (%d) > MAX_MAP_DISPINFO (%d)", nDisplacements, MAX_MAP_DISPINFO)
-		);
-	CMapLoadHelper lhDispInfo( LUMP_DISPINFO );
-	lhDispInfo.LoadLumpData( 0, nDisplacements * sizeof( ddispinfo_t ), tempDisps );
+	);
+	CMapLoadHelper lhDispInfo(LUMP_DISPINFO);
+	lhDispInfo.LoadLumpData(0, nDisplacements * sizeof(ddispinfo_t), tempDisps);
 
 	// Now hook up the displacements to their parents.
-	DispInfo_LinkToParentFaces( pWorld, tempDisps, nDisplacements );
+	DispInfo_LinkToParentFaces(pWorld, tempDisps, nDisplacements);
 
 	// First, create "groups" (or "combos") which contain all the displacements that 
 	// use the same material and lightmap.
-	DispInfo_CreateMaterialGroups( pWorld, pSortInfos );
+	DispInfo_CreateMaterialGroups(pWorld, pSortInfos);
 
 	// Now make the static buffers for each material/lightmap combo.
-	if ( g_VBAllocTracker )
-		g_VBAllocTracker->TrackMeshAllocations( "DispInfo_LoadDisplacements" );
-	DispInfo_CreateEmptyStaticBuffers( pWorld, tempDisps );
-	if ( g_VBAllocTracker )
-		g_VBAllocTracker->TrackMeshAllocations( NULL );
+	if (g_VBAllocTracker)
+		g_VBAllocTracker->TrackMeshAllocations("DispInfo_LoadDisplacements");
+	DispInfo_CreateEmptyStaticBuffers(pWorld, tempDisps);
+	if (g_VBAllocTracker)
+		g_VBAllocTracker->TrackMeshAllocations(NULL);
 
 	// Now setup each displacement one at a time.
 	// using temporary storage that is not the stack for compatibility with console stack
-#ifndef _X360
-	CDispVert tempVerts[MAX_DISPVERTS];
-#else
-	CUtlMemory< CDispVert > m_DispVertsBuf( 0, MAX_DISPVERTS );
-	CDispVert *tempVerts = m_DispVertsBuf.Base();
-#endif
 
-#ifndef _X360
+	CDispVert tempVerts[MAX_DISPVERTS];
+
 	CDispTri tempTris[MAX_DISPTRIS];
-#else
-	// using temporary storage that is not the stack for compatibility with console stack
-	CUtlMemory< CDispTri > m_DispTrisBuf( 0, MAX_DISPTRIS );
-	CDispTri *tempTris = m_DispTrisBuf.Base();
-#endif
 
 	int iCurVert = 0;
 	int iCurTri = 0;
@@ -659,50 +628,51 @@ bool DispInfo_LoadDisplacements( model_t *pWorld, bool bRestoring )
 	// Core displacement list.
 	CUtlVector<CCoreDispInfo*> aCoreDisps;
 	int iDisp = 0;
-	for ( iDisp = 0; iDisp < nDisplacements; ++iDisp )
+	for (iDisp = 0; iDisp < nDisplacements; ++iDisp)
 	{
-		CCoreDispInfo *pCoreDisp = new CCoreDispInfo;
-		aCoreDisps.AddToTail( pCoreDisp );
+		CCoreDispInfo* pCoreDisp = new CCoreDispInfo;
+		aCoreDisps.AddToTail(pCoreDisp);
 	}
-	
-	CMapLoadHelper lhDispVerts( LUMP_DISP_VERTS );
-	CMapLoadHelper lhDispTris( LUMP_DISP_TRIS );
 
-	for ( iDisp = 0; iDisp < nDisplacements; ++iDisp )
+	CMapLoadHelper lhDispVerts(LUMP_DISP_VERTS);
+	CMapLoadHelper lhDispTris(LUMP_DISP_TRIS);
+
+	for (iDisp = 0; iDisp < nDisplacements; ++iDisp)
 	{
 		// Get the current map displacement.
-		ddispinfo_t *pMapDisp = &tempDisps[iDisp];
-		if ( !pMapDisp )
+		ddispinfo_t* pMapDisp = &tempDisps[iDisp];
+		if (!pMapDisp)
 			continue;
 
 		// Load the vertices from the file.
-		int nVerts = NUM_DISP_POWER_VERTS( pMapDisp->power );
-		ErrorIfNot( nVerts <= MAX_DISPVERTS, ( "DispInfo_LoadDisplacements: invalid vertex count (%d)", nVerts ) );
-		lhDispVerts.LoadLumpData( iCurVert * sizeof(CDispVert), nVerts*sizeof(CDispVert), tempVerts );
+		int nVerts = NUM_DISP_POWER_VERTS(pMapDisp->power);
+		ErrorIfNot(nVerts <= MAX_DISPVERTS, ("DispInfo_LoadDisplacements: invalid vertex count (%d)", nVerts));
+		lhDispVerts.LoadLumpData(iCurVert * sizeof(CDispVert), nVerts * sizeof(CDispVert), tempVerts);
+
 		iCurVert += nVerts;
 
 		// Load the triangle indices from the file.
-		int nTris = NUM_DISP_POWER_TRIS( pMapDisp->power );
-		ErrorIfNot( nTris <= MAX_DISPTRIS, ( "DispInfo_LoadDisplacements: invalid tri count (%d)", nTris ) );
-		lhDispTris.LoadLumpData( iCurTri * sizeof(CDispTri), nTris*sizeof(CDispTri), tempTris );
+		int nTris = NUM_DISP_POWER_TRIS(pMapDisp->power);
+		ErrorIfNot(nTris <= MAX_DISPTRIS, ("DispInfo_LoadDisplacements: invalid tri count (%d)", nTris));
+		lhDispTris.LoadLumpData(iCurTri * sizeof(CDispTri), nTris * sizeof(CDispTri), tempTris);
 		iCurTri += nTris;
-	
+
 		// Now create the CoreDispInfo and the base CDispInfo.
-		if ( !DispInfo_CreateFromMapDisp( pWorld, iDisp, pMapDisp, aCoreDisps[iDisp], tempVerts, tempTris, pSortInfos, bRestoring ) )
+		if (!DispInfo_CreateFromMapDisp(pWorld, iDisp, pMapDisp, aCoreDisps[iDisp], tempVerts, tempTris, pSortInfos, bRestoring))
 			return false;
-	}	
+	}
 
 	// Smooth Normals.
-	SmoothDispSurfNormals( aCoreDisps.Base(), nDisplacements );
+	SmoothDispSurfNormals(aCoreDisps.Base(), nDisplacements);
 
 	// Fill in the static buffers.
-	for ( iDisp = 0; iDisp < nDisplacements; ++iDisp )
+	for (iDisp = 0; iDisp < nDisplacements; ++iDisp)
 	{
-		DispInfo_CreateStaticBuffersAndTags( pWorld, iDisp, aCoreDisps[iDisp], tempVerts );
-		
+		DispInfo_CreateStaticBuffersAndTags(pWorld, iDisp, aCoreDisps[iDisp], tempVerts);
+
 		// Copy over the now blended normals
-		CDispInfo *pDisp = GetModelDisp( pWorld, iDisp );
-		pDisp->CopyCoreDispVertData( aCoreDisps[iDisp], pDisp->m_BumpSTexCoordOffset );
+		CDispInfo* pDisp = GetModelDisp(pWorld, iDisp);
+		pDisp->CopyCoreDispVertData(aCoreDisps[iDisp], pDisp->m_BumpSTexCoordOffset);
 
 	}
 
@@ -711,22 +681,23 @@ bool DispInfo_LoadDisplacements( model_t *pWorld, bool bRestoring )
 
 	// If we're not using LOD, then maximally tesselate all the displacements and
 	// make sure they never change.
-	for ( iDisp=0; iDisp < nDisplacements; iDisp++ )
+	for (iDisp = 0; iDisp < nDisplacements; iDisp++)
 	{
-		CDispInfo *pDisp = GetModelDisp( pWorld, iDisp );
-		
+		CDispInfo* pDisp = GetModelDisp(pWorld, iDisp);
+
 		pDisp->m_ActiveVerts = pDisp->m_AllowedVerts;
 	}
 
-	for ( iDisp=0; iDisp < nDisplacements; iDisp++ )
+	for (iDisp = 0; iDisp < nDisplacements; iDisp++)
 	{
-		CDispInfo *pDisp = GetModelDisp( pWorld, iDisp );
-		pDisp->TesselateDisplacement();			
-	}		
+		CDispInfo* pDisp = GetModelDisp(pWorld, iDisp);
+		pDisp->TesselateDisplacement();
+	}
 
-	SetupMeshReaders( pWorld, nDisplacements );
+	SetupMeshReaders(pWorld, nDisplacements);
 
-	UpdateDispBBoxes( pWorld, nDisplacements );
+	UpdateDispBBoxes(pWorld, nDisplacements);
+
 
 	return true;
 }
