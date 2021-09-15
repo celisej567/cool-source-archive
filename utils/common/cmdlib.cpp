@@ -808,15 +808,19 @@ FileHandle_t SafeOpenRead( const char *filename )
 
 void SafeRead( FileHandle_t f, void *buffer, int count)
 {
-	if ( g_pFileSystem->Read (buffer, count, f) != (size_t)count)
-		Error ("File read failure");
+	if (g_pFileSystem->Read(buffer, count, f) != (size_t)count)
+	{
+		Error("File read failure");
+	}
 }
 
 
 void SafeWrite ( FileHandle_t f, void *buffer, int count)
 {
-	if (g_pFileSystem->Write (buffer, count, f) != (size_t)count)
-		Error ("File write failure");
+	if (g_pFileSystem->Write(buffer, count, f) != (size_t)count)
+	{
+		Error("File write failure");
+	}
 }
 
 

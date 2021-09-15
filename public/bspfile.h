@@ -971,6 +971,29 @@ enum emittype_t
 // Flags for dworldlight_t::flags
 #define DWL_FLAGS_INAMBIENTCUBE		0x0001	// This says that the light was put into the per-leaf ambient cubes.
 
+// Old version of the worldlight struct, used for backward compatibility loading.
+struct dworldlight_old_t
+{
+	DECLARE_BYTESWAP_DATADESC();
+	Vector		origin;
+	Vector		intensity;
+	Vector		normal;			// for surfaces and spotlights
+	int			cluster;
+	emittype_t	type;
+	int			style;
+	float		stopdot;		// start of penumbra for emit_spotlight
+	float		stopdot2;		// end of penumbra for emit_spotlight
+	float		exponent;		// 
+	float		radius;			// cutoff distance
+	// falloff for emit_spotlight + emit_point: 
+	// 1 / (constant_attn + linear_attn * dist + quadratic_attn * dist^2)
+	float		constant_attn;
+	float		linear_attn;
+	float		quadratic_attn;
+	int			flags;			// Uses a combination of the DWL_FLAGS_ defines.
+	int			texinfo;		// 
+	int			owner;			// entity that this light it relative to
+};
 
 struct dworldlight_t
 {

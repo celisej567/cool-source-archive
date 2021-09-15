@@ -1175,7 +1175,7 @@ void Mod_LoadWorldlights( CMapLoadHelper &lh, bool bIsHDR )
 		lh.GetMap()->worldlights = NULL;
 		return;
 	}
-	// dworldlight_t fix for previous bsp versions
+
 	if (s_MapHeader.version < BSPVERSION)
 	{
 		DevMsg("Detected bsp version lower than 21, fixing dworldlight_t struct order for compatibility\n");
@@ -1191,9 +1191,11 @@ void Mod_LoadWorldlights( CMapLoadHelper &lh, bool bIsHDR )
 	}
 	else
 	{
-		lh.GetMap()->numworldlights = lh.LumpSize() / sizeof(dworldlight_t);
-		lh.GetMap()->worldlights = (dworldlight_t*)Hunk_AllocName(lh.LumpSize(), va("%s [%s]", lh.GetLoadName(), "worldlights"));
-		memcpy(lh.GetMap()->worldlights, lh.LumpBase(), lh.LumpSize());
+		// dworldlight_t fix 
+		int nNumWorldLights = lh.LumpSize() / sizeof(dworldlight_old_t);
+
+		lh.GetMap()->numworldlights = nNumWorldLights;
+		lh.GetMap()->worldlights = (dworldlight_t*)Hunk_AllocName(nNumWorldLights * sizeof(dworldlight_t), va("%s [%s]", lh.GetLoadName(), "worldlights"));
 	}
 #if !defined( SWDS )
 	if ( r_lightcache_zbuffercache.GetInt() )
