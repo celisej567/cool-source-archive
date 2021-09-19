@@ -1,0 +1,129 @@
+//-----------------------------------------------------------------------------
+//	LAUNCHER.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		".."
+$Macro OUTBINDIR	"$SRCDIR\..\game"
+
+$Include "$SRCDIR\vpc_scripts\source_exe_base.vpc"
+
+// Must be built explicitly as "default" in order to build a compliant submittable Disc.
+// Renames will not work.
+$Macro OUTBINNAME	"default"
+$Macro OUTBINNAME       "hl2_osx" [$OSXALL]
+$Macro OUTBINNAME       "hl2_linux" [$LINUXALL]
+
+$Configuration
+{
+	$General
+	{
+			$AdditionalProjectDependencies		"$BASE;togl" [$OSXALL]
+	}
+	$Compiler
+	{
+		//$PreprocessorDefinitions	"$BASE;LAUNCHERONLY"
+		$PreprocessorDefinitions	"$BASE;fopen=dont_use_fopen"
+		$ForceIncludes				" "
+	}
+
+	$Linker
+	{
+		$AdditionalDependencies		"$BASE shlwapi.lib winmm.lib wsock32.lib odbc32.lib odbccp32.lib $SRCDIR\dx9sdk\lib\dinput8.lib $SRCDIR\dx9sdk\lib\ddraw.lib" [$WIN32]
+		$EnableLargeAddresses		"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)" [$WIN32]
+		$FixedBaseAddress			"Generate a relocation section (/FIXED:NO)" [$WIN32]
+
+		$SystemLibraries            "iconv" [$OSXALL]
+		$SystemFrameworks			"Carbon;AppKit;OpenGL;IOKit" [$OSXALL]
+		// We run from the ./game dir, but want to look in the ./game/bin directory when loading libraries.
+		//   To dump rpath/runpath of a library, use "chrpath --list blah.so" or "objdump -x blah.so" or "readelf -d bin/launcher.so"
+		$GCC_ExtraLinkerFlags		"-Wl,--enable-new-dtags -Wl,-z,origin -Wl,-rpath,'$$ORIGIN' -L/usr/lib32 -L/usr/lib" [$LINUXALL]
+	}
+	
+
+	$PreBuildEvent [$WIN32]
+	{
+		$CommandLine		"if EXIST $OUTBINDIR\coolsource.exe for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIR\coolsource.exe$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
+							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
+							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE del /q $QUOTE$(TargetDir)$QUOTE$(TargetFileName)" "\n" \
+							"$CRCCHECK"
+	}
+
+	$PostBuildEvent	[$X360]
+	{
+		// inherit and add
+		$CommandLine				"$BASE" \
+									"call $SRCDIR\vpc_scripts\valve_xbcp_wrapper.cmd $(TargetDir)$(TargetName).xex xE:\Valve\default.xex" "\n"
+	}
+
+}
+
+$Configuration "Debug"
+{
+	$Linker
+	{
+		$AdditionalDependencies			"$BASE Xonlined.lib" [$X360]
+	}
+}
+
+$Configuration "Release"
+{
+	$Linker
+	{
+		$AdditionalDependencies			"$BASE Xonline.lib" [$X360]
+	}
+}
+
+$Project "launcher"
+{
+	$Folder	"Source Files"
+	{
+		$File	"$SRCDIR\public\filesystem_init.cpp"
+		$File	"launcher.cpp"
+		$File	"reslistgenerator.cpp"
+		$File	"launcher.rc"
+	}
+
+	$Folder	"Header Files"
+	{
+		$File	"$SRCDIR\public\tier0\basetypes.h"
+		$File	"$SRCDIR\public\tier0\commonmacros.h"
+		$File	"$SRCDIR\public\tier0\dbg.h"
+		$File	"$SRCDIR\common\engine_launcher_api.h"
+		$File	"$SRCDIR\public\tier0\fasttimer.h"
+		$File	"$SRCDIR\public\appframework\IAppSystem.h"
+		$File	"$SRCDIR\public\tier0\icommandline.h"
+		$File	"ifilesystem.h"
+		$File	"$SRCDIR\public\vgui\IHTML.h"
+		$File	"$SRCDIR\public\vgui\IImage.h"
+		$File	"$SRCDIR\public\tier1\interface.h"
+		$File	"$SRCDIR\public\vgui\ISurface.h"
+		$File	"$SRCDIR\public\vgui\KeyCode.h"
+		$File	"$SRCDIR\public\tier0\mem.h"
+		$File	"$SRCDIR\public\tier0\memalloc.h"
+		$File	"$SRCDIR\public\vgui\MouseCode.h"
+		$File	"$SRCDIR\public\tier0\platform.h"
+		$File	"$SRCDIR\public\tier0\protected_things.h"
+		$File	"reslistgenerator.h"
+		$File	"$SRCDIR\public\string_t.h"
+		$File	"$SRCDIR\public\tier1\strtools.h"
+		$File	"$SRCDIR\public\tier0\vcr_shared.h"
+		$File	"$SRCDIR\public\tier0\vcrmode.h"
+		$File	"$SRCDIR\public\mathlib\vector2d.h"
+		$File	"$SRCDIR\public\vgui\VGUI.h"
+		$File	"$SRCDIR\public\vstdlib\vstdlib.h"
+	}
+
+	$folder	"Link Libraries"
+	{
+		$Lib	appframework
+		$Lib	tier2
+		$Lib	tier3
+		$Implib steam_api
+		$ImpLib togl [!$IS_LIB_PROJECT && $GL]
+		$ImpLib SDL2 [$SDL]
+	}
+
+}
+
