@@ -1,0 +1,6 @@
+..\..\devtools\bin\d3dx9_33.dll 
+..\..\dx10sdk\utilities\dx9_30\dx_proxy.dll 
+E:\Src\CoolSource\src\materialsystem\stdshadersdx11\..\..\..\game\bin\shadercompile.exe 
+E:\Src\CoolSource\src\materialsystem\stdshadersdx11\..\..\..\game\bin\shadercompile_dll.dll 
+E:\Src\CoolSource\src\materialsystem\stdshadersdx11\..\..\..\game\bin\vstdlib.dll 
+E:\Src\CoolSource\src\materialsystem\stdshadersdx11\..\..\..\game\bin\tier0.dll 

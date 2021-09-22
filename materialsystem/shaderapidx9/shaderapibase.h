@@ -26,7 +26,11 @@
 //-----------------------------------------------------------------------------
 // The Base implementation of the shader rendering interface
 //-----------------------------------------------------------------------------
+#ifdef DX11
+class CShaderAPIBase : public IShaderAPIDX11
+#else
 class CShaderAPIBase : public IShaderAPI
+#endif
 {
 public:
 	// constructor, destructor

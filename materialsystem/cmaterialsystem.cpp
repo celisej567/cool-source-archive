@@ -62,7 +62,7 @@ static ConVar mat_tonemapping_occlusion_use_stencil( "mat_tonemapping_occlusion_
 // In GL mode, we currently require mat_dxlevel to be between 90-92
 static ConVar mat_dxlevel( "mat_dxlevel", "92", 0, "", true, 90, true, 92, NULL );
 #else
-static ConVar mat_dxlevel( "mat_dxlevel", "0", 0, "Current DirectX Level. Competitive play requires at least mat_dxlevel 90", true, 0, true, 95, NULL  );
+static ConVar mat_dxlevel( "mat_dxlevel", "0", 0, "Current DirectX Level. Competitive play requires at least mat_dxlevel 90", true, 0, true, 110, NULL  );
 #endif
 
 IMaterialInternal *g_pErrorMaterial = NULL;
@@ -620,9 +620,14 @@ void CMaterialSystem::SetShaderAPI( char const *pShaderAPIDLL )
 		Error( "Cannot set the shader API twice!\n" );
 	}
 
-	if ( !pShaderAPIDLL )
+	// DX11FIXME
+	if (CommandLine()->ParmValue("-dxlevel", 90) >= 110)
 	{
-		pShaderAPIDLL = "shaderapidx9";
+		pShaderAPIDLL = "shaderapidx11.dll";
+	}
+	else if ( !pShaderAPIDLL )
+	{
+		pShaderAPIDLL = "shaderapidx9.dll";
 	}
 
 	// m_pShaderDLL is needed to spew driver info

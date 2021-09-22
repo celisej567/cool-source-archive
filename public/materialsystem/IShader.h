@@ -102,4 +102,10 @@ public:
 //	virtual const ShaderParamInfo_t& GetParamInfo( int paramIndex ) const = 0;
 };
 
+abstract_class IShaderDX11 : public IShader
+{
+public:
+		virtual void InitShader(IShaderDevice* pShaderDevice) = 0;
+};
+
 #endif // ISHADER_H

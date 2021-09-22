@@ -37,7 +37,9 @@ $Group "game"
 $Group "shaders"
 {
 	"game_shader_dx9"
-	"shaderapidx9"
+	"shaderapidx11"
+	"stdshader_dx11"
+	"shaderlib_dx11"
 }
 
 $Group "everything"

@@ -7899,7 +7899,7 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 		}
 		else
 		{	
-			HRESULT hr = ((IDirect3DTexture9*)tex.GetTexture())->GetSurfaceLevel( 0, &pZSurface );
+			hr = ((IDirect3DTexture9*)tex.GetTexture())->GetSurfaceLevel( 0, &pZSurface );
 		}
 
 		if ( !pZSurface )
@@ -7973,7 +7973,6 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 	if ( m_UsingTextureRenderTarget && nRenderTargetID == 0 )
 	{
 		D3DSURFACE_DESC  desc;
-		HRESULT hr;
 		if ( !pZSurface )
 		{
 			hr = pColorSurface->GetDesc( &desc );

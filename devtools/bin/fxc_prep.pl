@@ -473,7 +473,18 @@ sub GetShaderType
 {
 	local( $shadername ) = shift; # hack - use global variables
 	$shadername = $fxc_basename;
-	if( $shadername =~ m/ps30/i )
+	if( $shadername =~ m/ps40/i )
+	{
+		if( $debug )
+		{
+			return "ps_4_sw";
+		}
+		else
+		{
+			return "ps_4_0";
+		}
+	}
+	elsif( $shadername =~ m/ps30/i )
 	{
 		if( $debug )
 		{
@@ -513,6 +524,17 @@ sub GetShaderType
 	elsif( $shadername =~ m/ps11/i )
 	{
 		return "ps_1_1";
+	}
+	elsif( $shadername =~ m/vs40/i )
+	{
+		if( $debug )
+		{
+			return "vs_4_sw";
+		}
+		else
+		{
+			return "vs_4_0";
+		}
 	}
 	elsif( $shadername =~ m/vs30/i )
 	{

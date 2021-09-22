@@ -620,5 +620,12 @@ public:
 	virtual void UnlockRect( ShaderAPITextureHandle_t texHandle, int mipmap ) = 0;
 };
 
+abstract_class IShaderAPIDX11 : public IShaderAPI
+{
+public:
+	virtual void UpdateConstantBuffer(ConstantBufferHandle_t cbuffer, void* pNewData) = 0;
+	virtual ConstantBufferHandle_t GetInternalConstantBuffer(int type) = 0;
+};
+
 
 #endif // ISHADERAPI_H

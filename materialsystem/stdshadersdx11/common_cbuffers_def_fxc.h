@@ -1,0 +1,13 @@
+#ifndef COMMON_CBUFFERS_DEF_H_
+#define COMMON_CBUFFERS_DEF_H_
+
+// Convenience include if you need all the internal cbuffers
+
+#include "common_cbuffers_fxc.h"
+
+CBUFFER_PERMODEL( INTERNAL_CBUFFER_REG_0 )
+CBUFFER_PERFRAME( INTERNAL_CBUFFER_REG_1 )
+CBUFFER_PERSCENE( INTERNAL_CBUFFER_REG_2 )
+CBUFFER_SKINNING( INTERNAL_CBUFFER_REG_3 )
+
+#endif // COMMON_CBUFFERS_DEF_H_

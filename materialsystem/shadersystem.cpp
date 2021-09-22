@@ -222,7 +222,7 @@ const char *CShaderSystem::s_pDebugShaderName[MATERIAL_DEBUG_COUNT]	=
 	"DebugDrawEnvmapMask",
 	"DebugDepth",
 	"DebugDepth",
-	"Wireframe_DX9"
+	"Wireframe"
 };
 
 //-----------------------------------------------------------------------------
@@ -326,10 +326,21 @@ void CShaderSystem::LoadAllShaderDLLs( )
 	// 360 only supports its dx9 dll
 	int dxStart = IsX360() ? 9 : 6;
 	char buf[32];
-	for ( i = dxStart; i <= dxSupportLevel; ++i )
+
+	// DX11FIXME: older shaders are not supported in DX11
+	if (CommandLine()->ParmValue("-dxlevel", 90) >= 110)
 	{
-		Q_snprintf( buf, sizeof( buf ), "stdshader_dx%d%s", i, DLL_EXT_STRING );
-		LoadShaderDLL( buf );
+		char buf[32];
+		Q_snprintf(buf, sizeof(buf), "stdshader_dx%d%s", 11, DLL_EXT_STRING);
+		LoadShaderDLL(buf);
+	}
+	else
+	{
+		for (i = dxStart; i <= dxSupportLevel; ++i)
+		{
+			Q_snprintf(buf, sizeof(buf), "stdshader_dx%d%s", i, DLL_EXT_STRING);
+			LoadShaderDLL(buf);
+		}
 	}
 
 	const char *pShaderName = NULL;
@@ -700,7 +711,8 @@ void CShaderSystem::SetupShaderDictionary( int nShaderDLLIndex )
 				{
 					if ( pTestDLL->m_ShaderDict.Find( pShaderName ) != pTestDLL->m_ShaderDict.InvalidIndex() )
 					{ 
-						Error( "Game shader '%s' trying to override a base shader '%s'.", info.m_pFileName, pShaderName );
+						pTestDLL->m_ShaderDict.Remove(pShaderName);
+						Warning( "Game shader '%s' trying to override a base shader '%s'.", info.m_pFileName, pShaderName );
 					}
 				}
 			}

@@ -14,6 +14,7 @@
 #endif
 
 #include "shaderapi/shareddefs.h"
+#include "shaderapi/IShaderDevice.h"
 #include <materialsystem/imaterial.h>
 
 
@@ -232,6 +233,15 @@ enum PolygonOffsetMode_t
 	SHADER_POLYOFFSET_RESERVED		= 0x3	// Reserved for future use
 };
 
+enum ShaderInternalConstantBuffer_t
+{
+	SHADER_CONSTANTBUFFER_PERFRAME,
+	SHADER_CONSTANTBUFFER_PERMODEL,
+	SHADER_CONSTANTBUFFER_PERSCENE,
+	SHADER_CONSTANTBUFFER_SKINNING,
+	SHADER_CONSTANTBUFFER_FLEX,
+};
+
 
 //-----------------------------------------------------------------------------
 // The Shader interface versions
@@ -363,6 +373,16 @@ public:
 };
 // end class IShaderShadow
 
+abstract_class IShaderShadowDX11 : public IShaderShadow
+{
+public:
+	virtual void SetVertexShaderConstantBuffer(int slot, ConstantBufferHandle_t cbuffer) = 0;
+	virtual void SetGeometryShaderConstantBuffer(int slot, ConstantBufferHandle_t cbuffer) = 0;
+	virtual void SetPixelShaderConstantBuffer(int slot, ConstantBufferHandle_t cbuffer) = 0;
 
+	virtual void SetVertexShaderConstantBuffer(int slot, ShaderInternalConstantBuffer_t cbuffer) = 0;
+	virtual void SetGeometryShaderConstantBuffer(int slot, ShaderInternalConstantBuffer_t cbuffer) = 0;
+	virtual void SetPixelShaderConstantBuffer(int slot, ShaderInternalConstantBuffer_t cbuffer) = 0;
+};
 
 #endif // ISHADERSHADOW_H

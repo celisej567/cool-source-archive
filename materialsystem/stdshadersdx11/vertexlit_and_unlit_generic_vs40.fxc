@@ -1,0 +1,287 @@
+//======= Copyright © 1996-2007, Valve Corporation, All rights reserved. ======
+
+//  STATIC: "VERTEXCOLOR"				"0..1"
+//	STATIC: "CUBEMAP"					"0..1"
+//  STATIC: "HALFLAMBERT"				"0..1"
+//  DYNAMIC: "FLASHLIGHT"				"0..1"
+//  STATIC: "SEAMLESS_BASE"         	"0..1"
+//  STATIC: "SEAMLESS_DETAIL"       	"0..1"
+//  STATIC: "SEPARATE_DETAIL_UVS"   	"0..1"
+//  STATIC: "BUMPMAP"					"0..1"
+//	STATIC: "WRINKLEMAP"				"0..1"
+//  STATIC: "DECAL"						"0..1"
+
+//  DYNAMIC: "COMPRESSED_VERTS"			"0..1"
+//	DYNAMIC: "DYNAMIC_LIGHT"			"0..1"
+//	DYNAMIC: "STATIC_LIGHT"				"0..1"
+//	DYNAMIC: "DOWATERFOG"				"0..1"
+//	DYNAMIC: "SKINNING"					"0..1"
+//  DYNAMIC: "LIGHTING_PREVIEW"			"0..1"
+//  DYNAMIC: "MORPHING"					"0..1"
+
+// SKIP: ($CASCADED_SHADOW) && ($FLASHLIGHT)
+// SKIP: ($CASCADED_SHADOW) && ($SEAMLESS_BASE)
+// SKIP: ($CASCADED_SHADOW) && ($SEAMLESS_DETAIL)
+// SKIP: $CASCADED_SHADOW && $VERTEXCOLOR
+
+// If using static control flow on Direct3D, we should use the NUM_LIGHTS=0 combo
+// _SKIP: $USE_STATIC_CONTROL_FLOW && ( $NUM_LIGHTS > 0 ) [vs20]
+// SKIP: ($SEPARATE_DETAIL_UVS) && ($SEAMLESS_DETAIL)
+// SKIP: ($DONT_GAMMA_CONVERT_VERTEX_COLOR && ( ! $VERTEXCOLOR ) )
+
+//	SKIP: ($TREESWAY) && ($MORPHING)
+//	SKIP: ( $TREESWAY ) && ( $SEAMLESS_DETAIL || $SEAMLESS_BASE )
+
+#include "common_cbuffers_def_fxc.h"
+#include "common_vs_fxc.h"
+ 
+static const bool g_bSkinning		= SKINNING ? true : false;
+static const int  g_FogType			= DOWATERFOG;
+static const bool g_bVertexColor	= VERTEXCOLOR ? true : false;
+static const bool g_bCubemap		= CUBEMAP ? true : false;
+static const bool g_bFlashlight		= FLASHLIGHT ? true : false;
+static const bool g_bHalfLambert	= HALFLAMBERT ? true : false;
+static const bool g_bBumpmap		= BUMPMAP ? true : false;
+#if (MORPHING && DECAL)
+static const bool g_bDecalOffset	= true;
+#else
+static const bool g_bDecalOffset	= false;
+#endif
+
+#include "vertexlitgeneric_dx11_shared.h"
+
+//CBUFFER_FLEX( USER_CBUFFER_REG_0 )
+
+cbuffer VertexLitAndUnlitGeneric_CBuffer : USER_CBUFFER_REG_0
+{
+	VertexLitAndUnlitGeneric_t c;
+};
+
+#define SEAMLESS_SCALE c.cSeamlessScale.x
+
+#if MORPHING
+// NOTE: cMorphTargetTextureDim.xy = target dimensions,
+//		 cMorphTargetTextureDim.z = 4tuples/morph
+Texture2D morphTexture	:	register( t0 );
+SamplerState morphSampler	: register( s0 );
+#endif
+
+struct VS_INPUT
+{
+	// This is all of the stuff that we ever use.
+	float4 vPos				: POSITION;
+	float4 vBoneWeights		: BLENDWEIGHT;
+	uint4 vBoneIndices		: BLENDINDICES;
+	float4 vNormal			: NORMAL;
+	float4 vColor			: COLOR;
+	float3 vSpecular		: SPECULAR;
+	// make these float2's and stick the [n n 0 1] in the dot math.
+	float4 vTexCoord0		: TEXCOORD0;
+	float4 vTexCoord1		: TEXCOORD1;
+	float4 vTexCoord2		: TEXCOORD2;
+	float4 vTexCoord3		: TEXCOORD3;
+#if STATIC_LIGHT
+	float4 vStaticLight		: STATICLIGHTING;
+#endif
+
+#if BUMPMAP
+	float3 vTangentS		: TANGENT;
+	float3 vTangentT		: BINORMAL;
+	float4 vUserData		: USERDATA;
+#endif
+
+	// Position and normal/tangent deltas
+	float3 vPosFlex			: FLEXDELTA;
+	float3 vNormalFlex		: FLEXNORMAL;
+#if MORPHING
+	float vVertexID			: MORPHVERTEXID;
+#endif
+};
+
+
+struct VS_OUTPUT
+{
+    float4 projPos					: SV_POSITION;			// Projection-space position	
+
+#if SEAMLESS_BASE
+	float3 SeamlessTexCoord			: TEXCOORD0;		// Base texture x/y/z (indexed by swizzle)
+#else
+	float2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
+#endif
+#if SEAMLESS_DETAIL
+	float3 SeamlessDetailTexCoord	: TEXCOORD1;		// Detail texture coordinate
+#else
+	float2 detailTexCoord			: TEXCOORD1;		// Detail texture coordinate
+#endif
+	float4 color					: TEXCOORD2;		// Vertex color (from lighting or unlit)
+
+	float3 worldVertToEyeVector		: TEXCOORD3;		// Necessary for cubemaps
+
+	float3 worldSpaceNormal			: TEXCOORD4;		// Necessary for cubemaps and flashlight
+	float4 worldPos_ProjPosZ		: TEXCOORD5;
+#if BUMPMAP
+	float4 vWorldTangent			: TEXCOORD6;
+#endif
+#if WRINKLEMAP
+	float4 wrinkleHeight			: TEXCOORD7;
+#endif
+#if SEAMLESS_DETAIL || SEAMLESS_BASE
+	float3 SeamlessWeights          : COLOR0;				// x y z projection weights
+#endif
+	float3 eyeSpacePos				: COLOR1;
+
+};
+
+VS_OUTPUT main( const VS_INPUT v )
+{
+	VS_OUTPUT o = ( VS_OUTPUT )0;
+
+	bool bDynamicLight = DYNAMIC_LIGHT ? true : false;
+	bool bStaticLight = STATIC_LIGHT ? true : false;
+	bool bDoLighting = !g_bVertexColor && (bDynamicLight || bStaticLight);
+
+	float4 vPosition = v.vPos;
+	float3 vNormal = 0;
+#if BUMPMAP
+	float4 vTangent;
+	DecompressVertex_NormalTangent( v.vNormal, v.vUserData, vNormal, vTangent );
+#else
+	if ( bDoLighting || FLASHLIGHT || SEAMLESS_BASE || SEAMLESS_DETAIL || LIGHTING_PREVIEW || g_bDecalOffset || CUBEMAP )
+	{
+		// The vertex only contains valid normals if they are actually needed (fetching them when absent makes D3D complain)
+		DecompressVertex_Normal( v.vNormal, vNormal );
+	}
+#endif	
+
+#if SEAMLESS_BASE || SEAMLESS_DETAIL
+	// compute blend weights in rgb
+	float3 NNormal=normalize( vNormal );
+	o.SeamlessWeights.xyz = NNormal * NNormal;				// sums to 1.
+#endif
+	
+#if !MORPHING
+	#if BUMPMAP
+		ApplyMorph( v.vPosFlex, v.vNormalFlex, cFlexScale, vPosition.xyz, vNormal, vTangent.xyz );
+	#elif WRINKLEMAP
+		ApplyMorph( v.vPosFlex, v.vNormalFlex, cFlexScale, vPosition.xyz, vNormal, vTangent.xyz, o.wrinkleHeight.x );
+	#else
+		ApplyMorph( v.vPosFlex, v.vNormalFlex, cFlexScale, vPosition.xyz, vNormal );
+	#endif
+#else
+	#if BUMPMAP
+		ApplyMorph( morphSampler, cMorphTargetTextureDim, cMorphSubrect, 
+			v.vVertexID, v.vTexCoord2, vPosition.xyz, vNormal, vTangent.xyz );
+	#elif WRINKLEMAP
+		ApplyMorph( morphSampler, cMorphTargetTextureDim, cMorphSubrect, 
+			v.vVertexID, v.vTexCoord2, vPosition.xyz, vNormal, vTangent.xyz, o.wrinkleHeight.x );
+	#else
+		ApplyMorph( morphTexture, morphSampler, cMorphTargetTextureDim, cMorphSubrect, 
+			v.vVertexID, v.vTexCoord2, vPosition.xyz, vNormal );
+	#endif
+#endif
+
+#if !BUMPMAP
+	// Perform skinning
+	float3 worldNormal, worldPos;
+	SkinPositionAndNormal( 
+		g_bSkinning, 
+		vPosition, vNormal,
+		v.vBoneWeights, v.vBoneIndices,
+		cModel,
+		worldPos, worldNormal );
+#else
+	// Perform skinning
+	float3 worldNormal, worldPos, worldTangentS, worldTangentT;
+	SkinPositionNormalAndTangentSpace( g_bSkinning, vPosition, vNormal, vTangent,
+		v.vBoneWeights, v.vBoneIndices, cModel, worldPos,
+		worldNormal, worldTangentS, worldTangentT );
+#endif
+
+	o.eyeSpacePos = mul(float4(worldPos, 1), cViewMatrix).xyz;
+
+	if ( !g_bVertexColor || g_bBumpmap )
+	{
+		worldNormal = normalize( worldNormal );
+	}
+
+#if BUMPMAP
+	worldTangentS = normalize( worldTangentS );
+	worldTangentT = normalize( worldTangentT );
+	o.vWorldTangent = float4( worldTangentS.xyz, vTangent.w );	 // Propagate binormal sign in world tangent.w
+#endif
+
+#if MORPHING && DECAL
+	// Avoid z precision errors
+	worldPos += worldNormal * 0.05f * v.vTexCoord2.z;
+#endif
+	
+	o.worldSpaceNormal = worldNormal;
+
+	float4x4 viewProj = mul(cViewMatrix, cProjMatrix);
+
+	// Transform into projection space
+	float4 vProjPos = mul( float4( worldPos, 1 ), viewProj );
+	o.projPos = vProjPos;
+	
+	o.worldPos_ProjPosZ.xyz = worldPos.xyz;
+	o.worldPos_ProjPosZ.w = vProjPos.z;
+
+	// Needed for cubemaps 
+	o.worldVertToEyeVector.xyz = VSHADER_VECT_SCALE * (cEyePos.xyz - worldPos.xyz);
+
+	if ( g_bVertexColor )
+	{
+		//o.lightAtten = float4(0,0,0,0);
+		// Assume that this is unlitgeneric if you are using vertex color.
+		o.color.rgb = GammaToLinear( v.vColor.rgb );
+		o.color.a = v.vColor.a;
+	}
+	else
+	{
+
+#if STATIC_LIGHT
+		float3 col = v.vStaticLight * cOverbright;
+		o.color = float4( GammaToLinear( col ), v.vColor.a );
+#endif
+		
+		// This moved to the pixel shader.
+		// Scalar light attenuation
+		//o.lightAtten.x = GetAttenForLight( worldPos, 0 );
+		//o.lightAtten.y = GetAttenForLight( worldPos, 1 );
+		//o.lightAtten.z = GetAttenForLight( worldPos, 2 );
+		//o.lightAtten.w = GetAttenForLight( worldPos, 3 );
+	}
+	
+
+#if SEAMLESS_BASE
+	o.SeamlessTexCoord.xyz = SEAMLESS_SCALE * v.vPos.xyz;
+#else
+	// Base texture coordinates
+	o.baseTexCoord.x = dot( v.vTexCoord0, c.cBaseTexCoordTransform[0] );
+	o.baseTexCoord.y = dot( v.vTexCoord0, c.cBaseTexCoordTransform[1] );
+#endif
+
+#if SEAMLESS_DETAIL
+	// FIXME: detail texcoord as a 2d xform doesn't make much sense here, so I just do enough so
+	// that scale works. More smartness could allow 3d xform.
+	o.SeamlessDetailTexCoord.xyz = (SEAMLESS_SCALE*c.cDetailTexCoordTransform[0].x) * v.vPos.xyz;
+#else
+	// Detail texture coordinates
+	// FIXME: This shouldn't have to be computed all the time.
+	o.detailTexCoord.x = dot( v.vTexCoord0, c.cDetailTexCoordTransform[0] );
+	o.detailTexCoord.y = dot( v.vTexCoord0, c.cDetailTexCoordTransform[1] );
+#endif
+
+#if SEPARATE_DETAIL_UVS
+	o.detailTexCoord.xy = v.vTexCoord1.xy;
+#endif
+
+#if LIGHTING_PREVIEW
+	float dot=0.5+0.5*worldNormal*float3(0.7071,0.7071,0);
+	o.color.xyz=float3(dot,dot,dot);
+#endif
+
+	return o;
+}
+
+

@@ -1128,7 +1128,7 @@ int CTransitionTable::CreateNormalTransitions( const ShadowState_t& fromState, c
 	}
 
 	int nSamplerCount = HardwareConfig()->GetSamplerCount();
-	for ( int i = 0; i < nSamplerCount; ++i )
+	for ( i = 0; i < nSamplerCount; ++i )
 	{
 		ADD_SAMPLER_STATE_TRANSITION( i, SRGBReadEnable );
 		ADD_SAMPLER_STATE_TRANSITION( i, Fetch4Enable );

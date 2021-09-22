@@ -1,0 +1,12 @@
+#include "common_ps_fxc.h"
+
+struct PS_INPUT
+{
+	float4 vPos : SV_POSITION;
+	float4 vColor : COLOR;
+};
+
+float4 main(PS_INPUT i) : SV_TARGET
+{
+	return i.vColor;
+}

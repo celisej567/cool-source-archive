@@ -116,10 +116,12 @@ inline bool IsDynamicBufferType( ShaderBufferType_t type )
 DECLARE_POINTER_HANDLE( VertexShaderHandle_t );
 DECLARE_POINTER_HANDLE( GeometryShaderHandle_t );
 DECLARE_POINTER_HANDLE( PixelShaderHandle_t );
+DECLARE_POINTER_HANDLE( ConstantBufferHandle_t );
 
 #define VERTEX_SHADER_HANDLE_INVALID	( (VertexShaderHandle_t)0 )
 #define GEOMETRY_SHADER_HANDLE_INVALID	( (GeometryShaderHandle_t)0 )
 #define PIXEL_SHADER_HANDLE_INVALID		( (PixelShaderHandle_t)0 )
+#define CONSTANT_BUFFER_HANDLE_INVALID 		( (ConstantBufferHandle_t)0 )
 
 
 //-----------------------------------------------------------------------------
@@ -275,6 +277,15 @@ public:
 
 };
 
+abstract_class IShaderDeviceDX11 : public IShaderDevice
+{
+public:
+	virtual ConstantBufferHandle_t CreateConstantBuffer(size_t nBufSize) = 0;
+	virtual void UpdateConstantBuffer(ConstantBufferHandle_t hBuffer, void* pData) = 0;
+	virtual void UploadConstantBuffers(ConstantBufferHandle_t* pBuffers, int nBuffers) = 0;
+	virtual void DestroyConstantBuffer(ConstantBufferHandle_t hBuffer) = 0;
+	virtual ConstantBufferHandle_t GetInternalConstantBuffer(int type) = 0;
+};
 
 //-----------------------------------------------------------------------------
 // Helper wrapper for IShaderBuffer for reading precompiled shader files

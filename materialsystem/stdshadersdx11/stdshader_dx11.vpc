@@ -1,0 +1,108 @@
+//-----------------------------------------------------------------------------
+//	STDSHADER_DX9.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		"..\.."
+$Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+
+// shader_dll_verify.cpp defines a function called _ftol3. This means that we can't
+// link with the bug-fixed ftol3.obj. It also means we can't convert float-to-unsigned.
+$Macro DISABLE_FTOL3_OVERRIDE "1"
+
+$Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+$Configuration	"Debug"
+{
+	$General
+	{
+		$OutputDirectory		"Debug_dx9" [$WINDOWS]
+		$IntermediateDirectory	"Debug_dx9" [$WINDOWS]
+
+		$OutputDirectory		"Debug_dx9_360"		[$X360]
+		$IntermediateDirectory	"Debug_dx9_360"		[$X360]
+	}
+}
+
+$Configuration	"Release"
+{
+	$General
+	{
+		$OutputDirectory		"Release_dx9" [$WINDOWS]
+		$IntermediateDirectory	"Release_dx9" [$WINDOWS]
+
+		$OutputDirectory		"Release_dx9_360"	[$X360]
+		$IntermediateDirectory	"Release_dx9_360"	[$X360]
+	}
+}
+
+// Common Configuration
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;fxctmp9;vshtmp9;"	[$WIN32||$POSIX]
+		$AdditionalIncludeDirectories	"$BASE;..\..\dx9sdk\include"	[$WIN32]
+		$AdditionalIncludeDirectories	"$BASE;fxctmp9_360;vshtmp9_360"					[$X360]
+		$PreprocessorDefinitions		"$BASE;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS"
+		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [($WIN32||$X360) && !$GL]
+	}
+
+	$Linker
+	{
+		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WIN32]
+		$ModuleDefinitionFile			"xbox\xbox_dx9.def"				[$X360]
+		$SystemLibraries                                                        "iconv" [$OSXALL]
+	}
+}
+
+$Project "stdshader_dx11"
+{
+	$Folder	"Source Files"
+	{
+		$File			"BaseVSShader.cpp" \
+		"bik_dx11.cpp"\
+//		"decalmodulate_dx11.cpp"\/
+//		"lightmappedgeneric_dx11.cpp"\
+//		"lightmappedgeneric_dx11_helper.cpp"\
+		"modulate_dx11.cpp"\
+		"occlusion_dx11.cpp"\
+//		"sky_dx11.cpp"\
+//		"sky_hdr_dx11.cpp"\
+//		"sprite_dx11.cpp"\
+//		"spritecard.cpp"\
+		"test_dx11.cpp"\
+		"unlitgeneric_dx11.cpp"\
+//		"unlittwotexture_dx11.cpp"\
+//		"vertexlitgeneric_dx11.cpp"\
+//		"vertexlitgeneric_dx11_helper.cpp"\
+		"wireframe_dx11.cpp"\
+//		"worldvertextransition.cpp"\
+		"writez_dx11.cpp"
+
+		$File "../shader_dll_verify.cpp"
+	}
+	$Folder	"Header Files"
+	{
+		$File	"BaseVSShader.h"
+		$File "../shader_dll_verify.h"
+	}
+
+	$Folder "Link Libraries" 
+	{
+        $Lib	mathlib
+        $Lib	shaderlib_dx11
+    }
+
+	$File	"$SRCDIR\devtools\bin\vsh_prep.pl"
+	$File	"$SRCDIR\devtools\bin\psh_prep.pl"
+	$File	"$SRCDIR\devtools\bin\fxc_prep.pl"
+	$File	"$SRCDIR\devtools\bin\updateshaders.pl"
+	$File	"$SRCDIR\devtools\bin\copyshaders.pl"
+	$File	"$SRCDIR\devtools\bin\valve_perl_helpers.pl"
+	$File	"$SRCDIR\devtools\bin\checkshaderchecksums.pl"
+	$File	"_buildshaders.bat"
+
+	$Shaders	"_shaderlist_dx11.txt"
+}

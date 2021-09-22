@@ -1,0 +1,80 @@
+default:  fxctmp9_tmp\bik_vs40.inc fxctmp9_tmp\bik_ps40.inc fxctmp9_tmp\unlitgeneric_vs40.inc fxctmp9_tmp\unlitgeneric_ps40.inc fxctmp9_tmp\white_ps40.inc fxctmp9_tmp\writez_vs40.inc fxctmp9_tmp\modulate_ps40.inc fxctmp9_tmp\modulate_vs40.inc fxctmp9_tmp\splinecard_vs40.inc fxctmp9_tmp\spritecard_vs40.inc fxctmp9_tmp\spritecard_ps40.inc fxctmp9_tmp\sprite_ps40.inc fxctmp9_tmp\sprite_vs40.inc fxctmp9_tmp\sky_vs40.inc fxctmp9_tmp\sky_ps40.inc fxctmp9_tmp\sky_hdr_compressed_rgbs_ps40.inc fxctmp9_tmp\sky_hdr_compressed_ps40.inc fxctmp9_tmp\decalmodulate_ps40.inc fxctmp9_tmp\vertexlit_and_unlit_generic_vs40.inc fxctmp9_tmp\vertexlit_and_unlit_generic_ps40.inc fxctmp9_tmp\depthtodestalpha_vs40.inc fxctmp9_tmp\depthtodestalpha_ps40.inc fxctmp9_tmp\wireframe_ps40.inc fxctmp9_tmp\wireframe_vs40.inc fxctmp9_tmp\lightmappedgeneric_ps40.inc fxctmp9_tmp\lightmappedgeneric_vs40.inc
+
+fxctmp9_tmp\bik_vs40.inc :  bik_vs40.fxc shader_register_map.h lightinfo_fxc.h common_vs_fxc.h common_pragmas.h common_hlsl_cpp_consts.h common_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." bik_vs40.fxc-----bik_vs40
+
+fxctmp9_tmp\bik_ps40.inc :  bik_ps40.fxc shader_register_map.h common_pragmas.h lightinfo_fxc.h common_ps_fxc.h common_hlsl_cpp_consts.h common_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." bik_ps40.fxc-----bik_ps40
+
+fxctmp9_tmp\unlitgeneric_vs40.inc :  unlitgeneric_vs40.fxc common_vs_fxc.h common_pragmas.h common_cbuffers_fxc.h shader_register_map.h common_fxc.h unlittwotexture_constants_fxc.h lightinfo_fxc.h common_hlsl_cpp_consts.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." unlitgeneric_vs40.fxc-----unlitgeneric_vs40
+
+fxctmp9_tmp\unlitgeneric_ps40.inc :  unlitgeneric_ps40.fxc common_ps_fxc.h common_hlsl_cpp_consts.h common_fxc.h common_cbuffers_fxc.h shader_register_map.h lightinfo_fxc.h common_pragmas.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." unlitgeneric_ps40.fxc-----unlitgeneric_ps40
+
+fxctmp9_tmp\white_ps40.inc :  white_ps40.fxc common_fxc.h common_hlsl_cpp_consts.h common_ps_fxc.h common_pragmas.h lightinfo_fxc.h shader_register_map.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." white_ps40.fxc-----white_ps40
+
+fxctmp9_tmp\writez_vs40.inc :  writez_vs40.fxc common_hlsl_cpp_consts.h common_fxc.h shader_register_map.h common_cbuffers_fxc.h common_vs_fxc.h common_pragmas.h lightinfo_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." writez_vs40.fxc-----writez_vs40
+
+fxctmp9_tmp\modulate_ps40.inc :  modulate_ps40.fxc common_fxc.h common_pragmas.h common_cbuffers_fxc.h shader_register_map.h common_ps_fxc.h common_hlsl_cpp_consts.h lightinfo_fxc.h modulate_constants_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." modulate_ps40.fxc-----modulate_ps40
+
+fxctmp9_tmp\modulate_vs40.inc :  modulate_vs40.fxc common_fxc.h shader_register_map.h common_cbuffers_fxc.h common_pragmas.h common_vs_fxc.h common_hlsl_cpp_consts.h modulate_constants_fxc.h lightinfo_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." modulate_vs40.fxc-----modulate_vs40
+
+fxctmp9_tmp\splinecard_vs40.inc :  splinecard_vs40.fxc shader_register_map.h common_cbuffers_fxc.h common_vs_fxc.h common_pragmas.h lightinfo_fxc.h common_hlsl_cpp_consts.h common_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." splinecard_vs40.fxc-----splinecard_vs40
+
+fxctmp9_tmp\spritecard_vs40.inc :  spritecard_vs40.fxc common_hlsl_cpp_consts.h lightinfo_fxc.h spritecard_constants_fxc.h common_fxc.h common_cbuffers_fxc.h shader_register_map.h common_pragmas.h common_vs_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." spritecard_vs40.fxc-----spritecard_vs40
+
+fxctmp9_tmp\spritecard_ps40.inc :  spritecard_ps40.fxc common_cbuffers_fxc.h shader_register_map.h common_pragmas.h common_fxc.h lightinfo_fxc.h spritecard_constants_fxc.h common_ps_fxc.h common_hlsl_cpp_consts.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." spritecard_ps40.fxc-----spritecard_ps40
+
+fxctmp9_tmp\sprite_ps40.inc :  sprite_ps40.fxc common_fxc.h common_hlsl_cpp_consts.h common_ps_fxc.h common_pragmas.h lightinfo_fxc.h shader_register_map.h common_cbuffers_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." sprite_ps40.fxc-----sprite_ps40
+
+fxctmp9_tmp\sprite_vs40.inc :  sprite_vs40.fxc common_hlsl_cpp_consts.h common_fxc.h shader_register_map.h common_cbuffers_fxc.h common_vs_fxc.h common_pragmas.h lightinfo_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." sprite_vs40.fxc-----sprite_vs40
+
+fxctmp9_tmp\sky_vs40.inc :  sky_vs40.fxc lightinfo_fxc.h common_sky_fxc.h common_hlsl_cpp_consts.h common_pragmas.h common_vs_fxc.h shader_register_map.h common_cbuffers_fxc.h common_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." sky_vs40.fxc-----sky_vs40
+
+fxctmp9_tmp\sky_ps40.inc :  sky_ps40.fxc lightinfo_fxc.h common_sky_fxc.h common_ps_fxc.h common_hlsl_cpp_consts.h common_pragmas.h shader_register_map.h common_cbuffers_fxc.h common_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." sky_ps40.fxc-----sky_ps40
+
+fxctmp9_tmp\sky_hdr_compressed_rgbs_ps40.inc :  sky_hdr_compressed_rgbs_ps40.fxc common_sky_fxc.h common_ps_fxc.h common_hlsl_cpp_consts.h lightinfo_fxc.h common_fxc.h common_pragmas.h shader_register_map.h common_cbuffers_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." sky_hdr_compressed_rgbs_ps40.fxc-----sky_hdr_compressed_rgbs_ps40
+
+fxctmp9_tmp\sky_hdr_compressed_ps40.inc :  sky_hdr_compressed_ps40.fxc common_cbuffers_fxc.h shader_register_map.h lightinfo_fxc.h common_pragmas.h common_hlsl_cpp_consts.h common_ps_fxc.h common_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." sky_hdr_compressed_ps40.fxc-----sky_hdr_compressed_ps40
+
+fxctmp9_tmp\decalmodulate_ps40.inc :  decalmodulate_ps40.fxc common_fxc.h common_pragmas.h shader_register_map.h common_cbuffers_fxc.h common_hlsl_cpp_consts.h common_ps_fxc.h lightinfo_fxc.h vertexlitgeneric_dx11_shared.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." decalmodulate_ps40.fxc-----decalmodulate_ps40
+
+fxctmp9_tmp\vertexlit_and_unlit_generic_vs40.inc :  vertexlit_and_unlit_generic_vs40.fxc common_cbuffers_fxc.h shader_register_map.h common_pragmas.h common_vs_fxc.h common_cbuffers_def_fxc.h common_fxc.h vertexlitgeneric_dx11_shared.h lightinfo_fxc.h common_hlsl_cpp_consts.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." vertexlit_and_unlit_generic_vs40.fxc-----vertexlit_and_unlit_generic_vs40
+
+fxctmp9_tmp\vertexlit_and_unlit_generic_ps40.inc :  vertexlit_and_unlit_generic_ps40.fxc common_pragmas.h shader_register_map.h common_cbuffers_fxc.h common_fxc.h lightinfo_fxc.h common_flashlight_fxc.h vertexlitgeneric_dx11_shared.h common_cbuffers_def_noskinning_fxc.h common_ps_fxc.h common_vertexlitgeneric_dx11.h common_hlsl_cpp_consts.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." vertexlit_and_unlit_generic_ps40.fxc-----vertexlit_and_unlit_generic_ps40
+
+fxctmp9_tmp\depthtodestalpha_vs40.inc :  depthtodestalpha_vs40.fxc common_fxc.h common_hlsl_cpp_consts.h common_vs_fxc.h common_pragmas.h lightinfo_fxc.h shader_register_map.h common_cbuffers_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." depthtodestalpha_vs40.fxc-----depthtodestalpha_vs40
+
+fxctmp9_tmp\depthtodestalpha_ps40.inc :  depthtodestalpha_ps40.fxc common_hlsl_cpp_consts.h common_ps_fxc.h common_fxc.h shader_register_map.h lightinfo_fxc.h common_pragmas.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." depthtodestalpha_ps40.fxc-----depthtodestalpha_ps40
+
+fxctmp9_tmp\wireframe_ps40.inc :  wireframe_ps40.fxc common_pragmas.h lightinfo_fxc.h shader_register_map.h common_fxc.h common_ps_fxc.h common_hlsl_cpp_consts.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." wireframe_ps40.fxc-----wireframe_ps40
+
+fxctmp9_tmp\wireframe_vs40.inc :  wireframe_vs40.fxc common_hlsl_cpp_consts.h common_fxc.h common_cbuffers_fxc.h shader_register_map.h lightinfo_fxc.h common_vs_fxc.h common_pragmas.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." wireframe_vs40.fxc-----wireframe_vs40
+
+fxctmp9_tmp\lightmappedgeneric_ps40.inc :  lightmappedgeneric_ps40.fxc common_cbuffers_fxc.h shader_register_map.h common_pragmas.h lightmappedgeneric_dx11_shared_fxc.h common_fxc.h common_flashlight_fxc.h lightinfo_fxc.h lightmappedgeneric_ps40.h common_lightmappedgeneric_fxc.h common_ps_fxc.h common_hlsl_cpp_consts.h common_cbuffers_def_noskinning_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." lightmappedgeneric_ps40.fxc-----lightmappedgeneric_ps40
+
+fxctmp9_tmp\lightmappedgeneric_vs40.inc :  lightmappedgeneric_vs40.fxc lightinfo_fxc.h common_cbuffers_def_noskinning_fxc.h common_hlsl_cpp_consts.h common_pragmas.h common_vs_fxc.h common_cbuffers_fxc.h shader_register_map.h common_fxc.h lightmappedgeneric_dx11_shared_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl -novcs   -source "..\.." lightmappedgeneric_vs40.fxc-----lightmappedgeneric_vs40
+

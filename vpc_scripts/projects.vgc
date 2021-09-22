@@ -90,6 +90,21 @@ $Project "shaderapidx9"
 	"materialsystem\shaderapidx9\shaderapidx9.vpc"
 }
 
+$Project "shaderapidx11"
+{
+	"materialsystem\shaderapidx11\shaderapidx11.vpc"
+}
+
+$Project "stdshader_dx11"
+{
+	"materialsystem\stdshadersdx11\stdshader_dx11.vpc"
+}
+
+$Project "shaderlib_dx11"
+{
+	"materialsystem\shaderlib_dx11\shaderlib.vpc"
+}
+
 $Project "tgadiff"
 {
 	"utils\tgadiff\tgadiff.vpc" [$WIN32]

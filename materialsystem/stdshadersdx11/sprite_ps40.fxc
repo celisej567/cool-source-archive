@@ -1,0 +1,63 @@
+// STATIC: "VERTEXCOLOR"		"0..1"
+// STATIC: "CONSTANTCOLOR"		"0..1"
+// STATIC: "HDRTYPE"			"0..2"
+// STATIC: "SRGB"               "0..1"
+
+// DYNAMIC: "HDRENABLED"		"0..1"
+// DYNAMIC: "PIXELFOGTYPE"		"0..1"
+
+#include "common_cbuffers_fxc.h"
+CBUFFER_PERFRAME(register(b0))
+CBUFFER_PERSCENE(register(b1))
+
+cbuffer Sprite_PS40_t : register(b2)
+{
+	float4 g_HDRColorScale;
+	float4 cModulationColor;
+	float4 g_FogParams;
+	float4 g_FogColor;
+};
+
+#include "common_ps_fxc.h"
+
+#define g_Color					cModulationColor
+
+#define g_EyePos_SpecExponent		cEyePos
+
+Texture2D Tex		: register( t0 ); 
+sampler TexSampler	: register( s0 );
+
+struct PS_INPUT
+{
+	float4 projPos					: SV_POSITION;			// Projection-space position
+	HALF2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
+	float4 color					: TEXCOORD2;		// Vertex color (from lighting or unlit)
+	
+	float4 worldPos_projPosZ		: TEXCOORD7;		// Necessary for pixel fog
+	float3 eyeSpacePos				: TEXCOORD3;
+};
+
+float4 main( PS_INPUT i ) : SV_TARGET
+{
+	float4 sample = Tex.Sample( TexSampler, i.baseTexCoord );
+
+#if VERTEXCOLOR
+	sample *= i.color;
+#endif
+
+#if CONSTANTCOLOR
+	sample *= g_Color;
+#endif
+	
+#if HDRTYPE && HDRENABLED
+	sample.xyz *= g_HDRColorScale.x;
+#endif
+
+	float fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos_SpecExponent.z, i.worldPos_projPosZ.z, length( i.eyeSpacePos ) );
+#if SRGB
+	return FinalOutput( sample, fogFactor, PIXELFOGTYPE, g_FogColor, TONEMAP_SCALE_LINEAR, cToneMappingScale );
+#else
+	return FinalOutput( sample, fogFactor, PIXELFOGTYPE, g_FogColor, TONEMAP_SCALE_GAMMA, cToneMappingScale );
+#endif
+}
+

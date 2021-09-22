@@ -1,0 +1,87 @@
+//	STATIC: "VERTEXCOLOR"		"0..1"
+//	STATIC: "MODEL"				"0..1"
+
+#include "common_vs_fxc.h"
+
+static const bool g_bSkinning		= false;
+static const int  g_FogType			= 0;
+
+#include "unlittwotexture_constants_fxc.h"
+#include "common_cbuffers_fxc.h"
+
+CBUFFER_SKINNING(register(b0))
+CBUFFER_PERFRAME(register(b1))
+CBUFFER_PERSCENE(register(b2))
+
+/*cbuffer UnlitTwoTexture_CBuffer : register(b3)
+{
+	UnlitTwoTexture_t c;
+};*/
+
+#define cBaseTexCoordTransform c.cBaseTextureTransform
+#define cBaseTexCoordTransform2 c.cBaseTexture2Transform
+
+struct VS_INPUT
+{
+	// This is all of the stuff that we ever use.
+	float4 vPos				: POSITION;
+	float4 vBoneWeights		: BLENDWEIGHT;
+	uint4 vBoneIndices		: BLENDINDICES;
+	float4 vNormal			: NORMAL;
+	float4 vColor			: COLOR;
+	float3 vSpecular		: SPECULAR;
+	// make these float2's and stick the [n n 0 1] in the dot math.
+	float2 vTexCoord0		: TEXCOORD0;
+
+	// Position and normal/tangent deltas
+	float3 vPosFlex			: FLEXDELTA;
+	float3 vNormalFlex		: FLEXNORMAL;
+};
+
+struct VS_OUTPUT
+{
+    float4 projPos					: SV_POSITION;			// Projection-space position	
+	HALF2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
+	float4 vertexColor				: TEXCOORD1;
+	float3 eyeSpacePos				: TEXCOORD2;
+	float3 normals					: TEXCOORD3;
+	float4 worldPos_projPosZ		: TEXCOORD7;		// Necessary for water fog dest alpha
+};
+
+VS_OUTPUT main( const VS_INPUT v )
+{
+	VS_OUTPUT o = ( VS_OUTPUT )0;
+	
+	float4 vPosition = float4(v.vPos.xyz, 1.0f);
+
+	// Perform skinning
+	float3 worldNormal, worldPos;
+
+	worldPos = mul4x3( vPosition, (float4x3)cModel[0] );
+	worldNormal = mul3x3( v.vNormal.xyz, ( const float3x3 )cModel[0] );
+
+	float4x4 viewProj = mul(cViewMatrix, cProjMatrix);
+
+	// Transform into projection space
+	float4 projPos = mul( float4( worldPos, 1 ), viewProj );
+	o.projPos = projPos;
+
+	o.eyeSpacePos = mul(float4(worldPos, 1), cViewMatrix).xyz;
+	
+	// Needed for water fog alpha; 
+	// FIXME: we shouldn't have to compute this all thie time.
+	o.worldPos_projPosZ = float4( worldPos.xyz, projPos.z );
+
+	// Base texture coordinates
+    o.baseTexCoord = v.vTexCoord0.xy;
+
+#if VERTEXCOLOR
+	o.vertexColor = v.vColor;
+	#else
+	o.vertexColor = 1.0f.xxxx;
+#endif
+	
+    o.normals = v.vNormal.xyz;
+
+	return o;
+}

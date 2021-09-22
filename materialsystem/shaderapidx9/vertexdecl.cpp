@@ -434,7 +434,7 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 		pDecl[i].Type = bUseWrinkle ? D3DDECLTYPE_FLOAT4 : D3DDECLTYPE_FLOAT3;
 		++i;
 
-		int normalOffset = GetVertexElementSize( VERTEX_ELEMENT_POSITION, compressionType );
+		normalOffset = GetVertexElementSize( VERTEX_ELEMENT_POSITION, compressionType );
 		if ( bUseWrinkle )
 		{
 			normalOffset += GetVertexElementSize( VERTEX_ELEMENT_WRINKLE, compressionType );

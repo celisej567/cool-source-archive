@@ -1,0 +1,64 @@
+#include "common_cbuffers_fxc.h"
+CBUFFER_PERMODEL(register(b0)) // model matrix
+CBUFFER_PERFRAME(register(b1)) // view matrix
+CBUFFER_PERSCENE(register(b2)) // proj matrix
+
+#include "common_sky_fxc.h"
+
+cbuffer Sky_CBuffer_t : register(b3)
+{
+	Sky_t cSky;
+};
+
+#include "common_vs_fxc.h"
+
+#define TEXEL_XINCR (cSky.vTextureSizeInfo.x)
+#define TEXEL_YINCR (cSky.vTextureSizeInfo.y)
+#define U_TO_PIXEL_COORD_SCALE (cSky.vTextureSizeInfo.z)
+#define V_TO_PIXEL_COORD_SCALE (cSky.vTextureSizeInfo.w)
+
+struct VS_INPUT
+{
+	float4 vPos			: POSITION;
+	float2 vTexCoord0	: TEXCOORD0;
+};
+
+struct VS_OUTPUT
+{
+    float4 projPos					: SV_POSITION;
+    
+	float2 baseTexCoord00 : TEXCOORD0;
+	float2 baseTexCoord01 : TEXCOORD1;
+	float2 baseTexCoord10 : TEXCOORD2;
+	float2 baseTexCoord11 : TEXCOORD3;
+	float2 baseTexCoord_In_Pixels: TEXCOORD4;
+};
+
+VS_OUTPUT main( const VS_INPUT v )
+{
+	VS_OUTPUT o = ( VS_OUTPUT )0;
+
+	o.projPos = ComputeProjPos(v.vPos.xyz, cModelMatrix, cViewMatrix, cProjMatrix);
+
+	float4 vTexCoordInput = { v.vTexCoord0.x, v.vTexCoord0.y, 0.0f, 1.0f };
+	float2 vTexCoord;
+	vTexCoord.x = dot( vTexCoordInput.xyzw, cSky.mBaseTexCoordTransform[0] );
+	vTexCoord.y = dot( vTexCoordInput.xyzw, cSky.mBaseTexCoordTransform[1] );
+
+	// Compute quantities needed for pixel shader texture lerping
+	o.baseTexCoord00.x = vTexCoord.x - TEXEL_XINCR;
+	o.baseTexCoord00.y = vTexCoord.y - TEXEL_YINCR;
+	o.baseTexCoord10.x = vTexCoord.x + TEXEL_XINCR;
+	o.baseTexCoord10.y = vTexCoord.y - TEXEL_YINCR;
+
+	o.baseTexCoord01.x = vTexCoord.x - TEXEL_XINCR;
+	o.baseTexCoord01.y = vTexCoord.y + TEXEL_YINCR;
+	o.baseTexCoord11.x = vTexCoord.x + TEXEL_XINCR;
+	o.baseTexCoord11.y = vTexCoord.y + TEXEL_YINCR;
+
+	o.baseTexCoord_In_Pixels.xy = o.baseTexCoord00.xy;
+	o.baseTexCoord_In_Pixels.x *= U_TO_PIXEL_COORD_SCALE;
+	o.baseTexCoord_In_Pixels.y *= V_TO_PIXEL_COORD_SCALE;
+
+	return o;
+}

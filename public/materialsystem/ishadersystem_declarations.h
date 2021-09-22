@@ -116,7 +116,6 @@ enum PrecompiledShaderType_t
 	PRECOMPILED_SHADER_TYPE_COUNT,
 };
 
-
 //-----------------------------------------------------------------------------
 // Flags field of PrecompiledShader_t
 //-----------------------------------------------------------------------------
@@ -125,6 +124,7 @@ enum
 	// runtime flags
 	SHADER_IS_ASM = 0x1,
 	SHADER_FAILED_LOAD = 0x2,
+	SHADER_DYNAMIC_COMPILE_IS_HLSL = 0x4,
 };
 
 

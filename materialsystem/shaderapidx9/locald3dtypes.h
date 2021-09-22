@@ -44,9 +44,18 @@ public:
 	typedef ID3D10Device					*LPDIRECT3DDEVICE;
 	typedef ID3D10Buffer					*LPDIRECT3DINDEXBUFFER;
 	typedef ID3D10Buffer					*LPDIRECT3DVERTEXBUFFER;
-};
+}; 
 
-#endif // defined( DX10 ) && !defined( DX_TO_GL_ABSTRACTION )
+#elif defined(DX11)
+
+#include <d3d11.h>
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
+
+// Stupid typedef to avoid breaking API
+typedef ID3D11Resource IDirect3DBaseTexture;
+
+#else
 
 
 #if !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
@@ -108,13 +117,16 @@ public:
 	typedef IDirect3DVertexBuffer			*LPDIRECT3DVERTEXBUFFER;
 };
 
+#endif // defined( DX10 ) && !defined( DX_TO_GL_ABSTRACTION )
+
 typedef void *HardwareShader_t;
 
 //-----------------------------------------------------------------------------
 // The vertex and pixel shader type
 //-----------------------------------------------------------------------------
 typedef int VertexShader_t;
-typedef int PixelShader_t;	
+typedef int PixelShader_t;
+typedef int GeometryShader_t;
 
 //-----------------------------------------------------------------------------
 // Bitpattern for an invalid shader
