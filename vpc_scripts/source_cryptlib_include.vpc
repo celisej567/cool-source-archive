@@ -26,29 +26,29 @@ $Project
 	{
 		$Lib	vpklib
 		// So we can check the signature of the item schema.
-		$Lib	"$SRCDIR\lib\public\$PLATSUBDIR\2013\release\cryptlib" [$WINDOWS&&!$VS2015]
+		//$Lib	"$SRCDIR\lib\public\$PLATSUBDIR\2013\release\cryptlib" [$WINDOWS&&!$VS2015]
 		$Libexternal $LIBCOMMON/libcrypto [$OSXALL]
 		$Libexternal $LIBCOMMON/libcryptopp [$OSXALL]
 		$Libexternal "$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL]
 		$Libexternal "$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcryptopp" [$LINUXALL]
 	}
 
-	$Folder "Link Libraries" [$VS2015]
+	$Folder "Link Libraries" [$VS2013]
 	{
-		$File "$SRCDIR\lib\common\win32\2015\release\cryptlib.lib" [$WIN32]
+		$File "$SRCDIR\lib\common\win32\2019\release\cryptlib.lib" [$WIN32]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\lib\common\win32\2015\debug\cryptlib.lib" [$WIN32]
+		$File "$SRCDIR\lib\common\win32\2019\debug\cryptlib.lib" [$WIN32]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}
 		
-		$File "$SRCDIR\lib\common\$PLATSUBDIR\2015\release\cryptlib.lib" [$WIN64]
+		$File "$SRCDIR\lib\common\$PLATSUBDIR\2019\release\cryptlib.lib" [$WIN64]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\lib\common\$PLATSUBDIR\2015\debug\cryptlib.lib" [$WIN64]
+		$File "$SRCDIR\lib\common\$PLATSUBDIR\2019\debug\cryptlib.lib" [$WIN64]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}

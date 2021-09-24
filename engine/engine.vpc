@@ -38,6 +38,7 @@ $Configuration
 	{
 		$AdditionalDependencies			"$BASE dinput8.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib" [$WINDOWS]
 		$AdditionalLibraryDirectories	"$BASE;$SRCDIR\lib\common\vc7;$SRCDIR\dx9sdk\lib" [$WINDOWS]
+		$IgnoreSpecificLibrary			"libc;libcd;libcmtd;libcpmtd;libcpmtd0;libcpmtd1;msvcrt"
 		$SystemFrameworks				"Carbon;AppKit;OpenAL;CoreAudio;AudioToolbox;SystemConfiguration;Quicktime;AudioUnit" [$OSXALL]
 		$SystemLibraries				"iconv" [$OSXALL]
 		$SystemLibraries				"rt;openal;curl-gnutls" [$LINUXALL]

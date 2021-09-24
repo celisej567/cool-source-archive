@@ -1,1 +1,2 @@
-devtools\bin\vpc.exe /episodic +game +shaders /mksln games.sln
+devtools\bin\vpc.exe /2019 /episodic +game +coolsource +shaders /mksln games.sln
+pause

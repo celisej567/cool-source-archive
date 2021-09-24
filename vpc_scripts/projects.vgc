@@ -70,6 +70,11 @@ $Project "phonemeextractor"
 	"utils\phonemeextractor\phonemeextractor.vpc" [$WIN32]
 }
 
+$Project "particles"
+{
+	"particles\particles.vpc" 
+}
+
 $Project "raytrace"
 {
 	"raytrace\raytrace.vpc" [$WIN32||$X360||$POSIX]

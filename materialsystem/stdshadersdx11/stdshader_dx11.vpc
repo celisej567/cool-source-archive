@@ -102,7 +102,7 @@ $Project "stdshader_dx11"
 	$File	"$SRCDIR\devtools\bin\copyshaders.pl"
 	$File	"$SRCDIR\devtools\bin\valve_perl_helpers.pl"
 	$File	"$SRCDIR\devtools\bin\checkshaderchecksums.pl"
-	$File	"_buildshaders.bat"
+	$File	"buildshaders.bat"
 
 	$Shaders	"_shaderlist_dx11.txt"
 }
