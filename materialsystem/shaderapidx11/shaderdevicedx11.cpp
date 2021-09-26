@@ -226,7 +226,7 @@ bool CShaderDeviceMgrDx11::ComputeCapsFromD3D( HardwareCaps_t *pCaps, IDXGIAdapt
 	pCaps->m_SupportsPixelShaders_2_b = true;
 	pCaps->m_SupportsShaderModel_3_0 = true;
 	pCaps->m_SupportsCompressedTextures = COMPRESSED_TEXTURES_ON;
-	pCaps->m_SupportsCompressedVertices = VERTEX_COMPRESSION_ON;
+	pCaps->m_SupportsCompressedVertices = VERTEX_COMPRESSION_NONE;
 	pCaps->m_bSupportsAnisotropicFiltering = true;
 	pCaps->m_bSupportsMagAnisotropicFiltering = true;
 	pCaps->m_bSupportsVertexTextures = true;
