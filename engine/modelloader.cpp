@@ -1180,7 +1180,8 @@ void Mod_LoadWorldlights( CMapLoadHelper &lh, bool bIsHDR )
 	{
 		DevMsg("Detected bsp version lower than 21, fixing dworldlight_t struct order for compatibility\n");
 
-		lh.GetMap()->numworldlights = lh.LumpSize() / (sizeof(dworldlight_t) - sizeof(Vector));
+		int nOldNumWorldLights = lh.LumpSize() / sizeof(dworldlight_old_t);
+		lh.GetMap()->numworldlights = nOldNumWorldLights;
 		lh.GetMap()->worldlights = (dworldlight_t*)Hunk_AllocName(lh.GetMap()->numworldlights * sizeof(dworldlight_t), va("%s [%s]", lh.GetLoadName(), "worldlights"));
 		for (int iLight = 0; iLight < lh.GetMap()->numworldlights; iLight++)
 		{
@@ -1191,8 +1192,7 @@ void Mod_LoadWorldlights( CMapLoadHelper &lh, bool bIsHDR )
 	}
 	else
 	{
-		// dworldlight_t fix 
-		int nNumWorldLights = lh.LumpSize() / sizeof(dworldlight_old_t);
+		int nNumWorldLights = lh.LumpSize() / sizeof(dworldlight_t);
 
 		lh.GetMap()->numworldlights = nNumWorldLights;
 		lh.GetMap()->worldlights = (dworldlight_t*)Hunk_AllocName(nNumWorldLights * sizeof(dworldlight_t), va("%s [%s]", lh.GetLoadName(), "worldlights"));
