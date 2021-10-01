@@ -100,6 +100,31 @@ $Project "shaderapidx11"
 	"materialsystem\shaderapidx11\shaderapidx11.vpc"
 }
 
+$Project "stdshader_dbg"
+{
+	"materialsystem\stdshaders\stdshader_dbg.vpc" [$WIN32||$X360||$POSIX]
+}
+
+$Project "stdshader_dx6"
+{
+	"materialsystem\stdshaders\stdshader_dx6.vpc" [$WIN32]
+}
+
+$Project "stdshader_dx7"
+{
+	"materialsystem\stdshaders\stdshader_dx7.vpc" [$WIN32]
+}
+
+$Project "stdshader_dx8"
+{
+	"materialsystem\stdshaders\stdshader_dx8.vpc" [$WIN32]
+}
+
+$Project "stdshader_dx9"
+{
+	"materialsystem\stdshaders\stdshader_dx9.vpc" [$WINDOWS||$X360||$POSIX]
+}
+
 $Project "stdshader_dx11"
 {
 	"materialsystem\stdshadersdx11\stdshader_dx11.vpc"
