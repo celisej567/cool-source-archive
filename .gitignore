@@ -298,3 +298,8 @@ paket-files/
 *.vcxproj.filters
 *.vcxproj.vpc_crc
 *.sln
+
+lib/public/mathlib.lib
+lib/public/tier1.lib
+lib/public/vgui_controls.lib
+lib/public/vtf.lib
