@@ -1146,12 +1146,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif
 
 	// Run in text mode? (No graphics or sound).
-	// NOTE: Currently crashing the game, will look into later.
-	//if (CommandLine()->CheckParm("-textmode"))
-	//{
-	//	g_bTextMode = true;
-	//	InitTextMode();
-	//}
+    if (CommandLine()->CheckParm("-textmode"))
+	{
+		g_bTextMode = true;
+		InitTextMode();
+	}
 #ifdef WIN32
 	else
 	{
@@ -1214,8 +1213,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 #ifdef WIN32
 	// Make low priority?
-	// NOTE: This currently is causing a crash. Will look into this later.
-	/*
 	if (CommandLine()->CheckParm("-low"))
 	{
 		SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
@@ -1224,7 +1221,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 	}
-	*/
 #endif
 
 	// If game is not run from Steam then add -insecure in order to avoid client timeout message
@@ -1266,8 +1262,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		if (!bReslistCycle)
 		{
 			// Remove any overrides in case settings changed
-			// NOTE: This, sadly, is also causing a crash. Will look into, later.
-			/*
 			CommandLine()->RemoveParm("-w");
 			CommandLine()->RemoveParm("-h");
 			CommandLine()->RemoveParm("-width");
@@ -1281,7 +1275,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			CommandLine()->RemoveParm("-dxlevel");
 			CommandLine()->RemoveParm("-autoconfig");
 			CommandLine()->RemoveParm("+mat_hdr_level");
-			*/
 		}
 	}
 
