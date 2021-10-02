@@ -668,7 +668,9 @@ public:
     int         minTess;                            // minimum tesselation allowed
     float       smoothingAngle;                     // lighting smoothing angle
     int         contents;                           // surface contents
+#ifdef BSP23
 	int         unknown1;                           // unknown, for bsp 23
+#endif
 
 	unsigned short	m_iMapFace;						// Which map face this displacement comes from.
 	
@@ -676,9 +678,9 @@ public:
 													// The count is m_pParent->lightmapTextureSizeInLuxels[0]*m_pParent->lightmapTextureSizeInLuxels[1].
 
 	int			m_iLightmapSamplePositionStart;		// Index into LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS.
-
+#ifdef BSP23
 	int         unknown2;                           // unknown, for bsp 23
-
+#endif
 	CDispNeighbor			m_EdgeNeighbors[4];		// Indexed by NEIGHBOREDGE_ defines.
 	CDispCornerNeighbors	m_CornerNeighbors[4];	// Indexed by CORNER_ defines.
 
@@ -1065,7 +1067,9 @@ private:
 
 public:
 	int			aFaces[OVERLAY_BSP_FACE_COUNT];
+#ifdef BSP23
 	int         unknown; //bsp 23
+#endif
 	float		flU[2];
 	float		flV[2];
 	Vector		vecUVPoints[4];
