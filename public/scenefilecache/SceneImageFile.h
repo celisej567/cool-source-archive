@@ -14,7 +14,7 @@
 #include "tier1/checksum_crc.h"
 
 #define SCENE_IMAGE_ID			MAKEID( 'V','S','I','F' )
-#define SCENE_IMAGE_VERSION		2
+#define SCENE_IMAGE_VERSION		3
 
 // scene summary: cached calcs for commmon startup queries, variable sized
 struct SceneImageSummary_t

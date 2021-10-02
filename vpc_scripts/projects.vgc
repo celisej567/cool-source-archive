@@ -90,6 +90,11 @@ $Project "serverplugin_empty"
 	"utils\serverplugin_sample\serverplugin_empty.vpc" [$WIN32||$POSIX]
 }
 
+$Project "scenefilecache"
+{
+	"scenefilecache\scenefilecache.vpc" [$WIN32||$POSIX]
+}
+
 $Project "shaderapidx9"
 {
 	"materialsystem\shaderapidx9\shaderapidx9.vpc"
