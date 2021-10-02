@@ -142,9 +142,15 @@ BEGIN_BYTESWAP_DATADESC( ddispinfo_t )
 	DEFINE_FIELD( minTess, FIELD_INTEGER ),
 	DEFINE_FIELD( smoothingAngle, FIELD_FLOAT ),
 	DEFINE_FIELD( contents, FIELD_INTEGER ),
+#ifdef BSP23
+	DEFINE_FIELD( unknown1, FIELD_INTEGER),
+#endif
 	DEFINE_FIELD( m_iMapFace, FIELD_SHORT ),
 	DEFINE_FIELD( m_iLightmapAlphaStart, FIELD_INTEGER ),
 	DEFINE_FIELD( m_iLightmapSamplePositionStart, FIELD_INTEGER ),
+#ifdef BSP23
+	DEFINE_FIELD( unknown2, FIELD_INTEGER),
+#endif
 	DEFINE_EMBEDDED_ARRAY( m_EdgeNeighbors, 4 ),
 	DEFINE_EMBEDDED_ARRAY( m_CornerNeighbors, 4 ),
 	DEFINE_ARRAY( m_AllowedVerts, FIELD_INTEGER, ddispinfo_t::ALLOWEDVERTS_SIZE ),	// unsigned long
@@ -311,16 +317,19 @@ BEGIN_BYTESWAP_DATADESC( dcubemapsample_t )
 	DEFINE_FIELD( size, FIELD_CHARACTER ),
 END_BYTESWAP_DATADESC()
 
-BEGIN_BYTESWAP_DATADESC( doverlay_t )
-	DEFINE_FIELD( nId, FIELD_INTEGER ),
-	DEFINE_FIELD( nTexInfo, FIELD_SHORT ),
-	DEFINE_FIELD( m_nFaceCountAndRenderOrder, FIELD_SHORT ),
-	DEFINE_ARRAY( aFaces, FIELD_INTEGER, OVERLAY_BSP_FACE_COUNT ),
-	DEFINE_ARRAY( flU, FIELD_FLOAT, 2 ),
-	DEFINE_ARRAY( flV, FIELD_FLOAT, 2 ),
-	DEFINE_ARRAY( vecUVPoints, FIELD_VECTOR, 4 ),
-	DEFINE_FIELD( vecOrigin, FIELD_VECTOR ),
-	DEFINE_FIELD( vecBasisNormal, FIELD_VECTOR ),
+BEGIN_BYTESWAP_DATADESC(doverlay_t)
+    DEFINE_FIELD(nId, FIELD_INTEGER),
+    DEFINE_FIELD(nTexInfo, FIELD_SHORT),
+	DEFINE_FIELD(m_nFaceCountAndRenderOrder, FIELD_SHORT),
+	DEFINE_ARRAY(aFaces, FIELD_INTEGER, OVERLAY_BSP_FACE_COUNT),
+#ifdef BSP23
+	DEFINE_FIELD(unknown, FIELD_INTEGER),
+#endif
+	DEFINE_ARRAY(flU, FIELD_FLOAT, 2),
+	DEFINE_ARRAY(flV, FIELD_FLOAT, 2),
+	DEFINE_ARRAY(vecUVPoints, FIELD_VECTOR, 4),
+	DEFINE_FIELD(vecOrigin, FIELD_VECTOR),
+	DEFINE_FIELD(vecBasisNormal, FIELD_VECTOR),
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( dwateroverlay_t )
@@ -607,6 +616,7 @@ dtexdata_t	dtexdata[MAX_MAP_TEXDATA];
 // displacement map bsp file info: dispinfo
 //
 CUtlVector<ddispinfo_t> g_dispinfo;
+
 CUtlVector<CDispVert> g_DispVerts;
 CUtlVector<CDispTri> g_DispTris;
 CUtlVector<unsigned char> g_DispLightmapSamplePositions; // LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS
@@ -2218,8 +2228,9 @@ void LoadBSPFile( const char *filename )
 	numnodes = CopyLump( LUMP_NODES, dnodes );
 	CopyLump( LUMP_TEXINFO, texinfo );
 	numtexdata = CopyLump( LUMP_TEXDATA, dtexdata );
-    
-	CopyLump( LUMP_DISPINFO, g_dispinfo );
+
+	CopyLump(LUMP_DISPINFO, g_dispinfo);
+
     CopyLump( LUMP_DISP_VERTS, g_DispVerts );
 	CopyLump( LUMP_DISP_TRIS, g_DispTris );
     CopyLump( FIELD_CHARACTER, LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS, g_DispLightmapSamplePositions );
@@ -2648,7 +2659,8 @@ void WriteBSPFile( const char *filename, char *pUnused )
 	AddLump( LUMP_TEXINFO, texinfo );
 	AddLump( LUMP_TEXDATA, dtexdata, numtexdata );    
 
-    AddLump( LUMP_DISPINFO, g_dispinfo );
+	AddLump(LUMP_DISPINFO, g_dispinfo);
+
     AddLump( LUMP_DISP_VERTS, g_DispVerts );
 	AddLump( LUMP_DISP_TRIS, g_DispTris );
     AddLump( LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS, g_DispLightmapSamplePositions );
@@ -2880,7 +2892,8 @@ void PrintBSPFileSizes (void)
 	totalmemory += ArrayUsage( "texinfos",		texinfo.Count(),MAX_MAP_TEXINFO,		sizeof(texinfo_t) );
 	totalmemory += ArrayUsage( "texdata",		numtexdata,		ENTRIES(dtexdata),		ENTRYSIZE(dtexdata) );
     
-	totalmemory += ArrayUsage( "dispinfos",     g_dispinfo.Count(),			0,			sizeof( ddispinfo_t ) );
+	totalmemory += ArrayUsage("dispinfos", g_dispinfo.Count(), 0, sizeof(ddispinfo_t));
+
     totalmemory += ArrayUsage( "disp_verts",	g_DispVerts.Count(),		0,			sizeof( g_DispVerts[0] ) );
     totalmemory += ArrayUsage( "disp_tris",		g_DispTris.Count(),			0,			sizeof( g_DispTris[0] ) );
     totalmemory += ArrayUsage( "disp_lmsamples",g_DispLightmapSamplePositions.Count(),0,sizeof( g_DispLightmapSamplePositions[0] ) );
@@ -4854,7 +4867,7 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 	SwapLumpToDisk<dnode_t>( LUMP_NODES );
 	SwapLumpToDisk<texinfo_t>( LUMP_TEXINFO );
 	SwapLumpToDisk<dtexdata_t>( LUMP_TEXDATA );
-	SwapLumpToDisk<ddispinfo_t>( LUMP_DISPINFO );
+	SwapLumpToDisk<ddispinfo_t>(LUMP_DISPINFO);
     SwapLumpToDisk<CDispVert>( LUMP_DISP_VERTS );
 	SwapLumpToDisk<CDispTri>( LUMP_DISP_TRIS );
     SwapLumpToDisk<char>( FIELD_CHARACTER, LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS );

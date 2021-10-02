@@ -22,8 +22,18 @@
 
 // MINBSPVERSION is the minimum acceptable version.  The engine will load MINBSPVERSION through BSPVERSION
 #define MINBSPVERSION 19
-#define BSPVERSION 21
 
+// Uncomment this will enable Dota 2's bsp 23 support
+// 
+// WARNING: THIS WILL BREAK COMPATIBILTY WITH OLDER MAPS!!!
+// 
+//#define BSP23
+
+#ifdef BSP23
+#define BSPVERSION 23
+#else
+#define BSPVERSION 21
+#endif
 
 // This needs to match the value in gl_lightmap.h
 // Need to dynamically allocate the weights and light values in radial_t to make this variable.
@@ -658,6 +668,7 @@ public:
     int         minTess;                            // minimum tesselation allowed
     float       smoothingAngle;                     // lighting smoothing angle
     int         contents;                           // surface contents
+	int         unknown1;                           // unknown, for bsp 23
 
 	unsigned short	m_iMapFace;						// Which map face this displacement comes from.
 	
@@ -665,6 +676,8 @@ public:
 													// The count is m_pParent->lightmapTextureSizeInLuxels[0]*m_pParent->lightmapTextureSizeInLuxels[1].
 
 	int			m_iLightmapSamplePositionStart;		// Index into LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS.
+
+	int         unknown2;                           // unknown, for bsp 23
 
 	CDispNeighbor			m_EdgeNeighbors[4];		// Indexed by NEIGHBOREDGE_ defines.
 	CDispCornerNeighbors	m_CornerNeighbors[4];	// Indexed by CORNER_ defines.
@@ -1041,10 +1054,10 @@ struct doverlay_t
 	short		nTexInfo;
 
 	// Accessors..
-	void			SetFaceCount( unsigned short count );
+	void			SetFaceCount(unsigned short count);
 	unsigned short	GetFaceCount() const;
 
-	void			SetRenderOrder( unsigned short order );
+	void			SetRenderOrder(unsigned short order);
 	unsigned short	GetRenderOrder() const;
 
 private:
@@ -1052,13 +1065,13 @@ private:
 
 public:
 	int			aFaces[OVERLAY_BSP_FACE_COUNT];
+	int         unknown; //bsp 23
 	float		flU[2];
 	float		flV[2];
 	Vector		vecUVPoints[4];
 	Vector		vecOrigin;
 	Vector		vecBasisNormal;
 };
-
 
 inline void doverlay_t::SetFaceCount( unsigned short count )
 {
