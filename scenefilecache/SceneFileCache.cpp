@@ -84,8 +84,8 @@ InitReturnVal_t CSceneFileCache::Init()
 		if ( filesystem->ReadFile( pSceneImageName, "GAME", m_SceneImageFile ) )
 		{
 			SceneImageHeader_t *pHeader = (SceneImageHeader_t *)m_SceneImageFile.Base();
-			if ( pHeader->nId != SCENE_IMAGE_ID || 
-				pHeader->nVersion != SCENE_IMAGE_VERSION )
+			if ( pHeader->nId > SCENE_IMAGE_ID || 
+				pHeader->nVersion > SCENE_IMAGE_VERSION )
 			{
 				Error( "CSceneFileCache: Bad scene image file %s\n", pSceneImageName );
 			}
