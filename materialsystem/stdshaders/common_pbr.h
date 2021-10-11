@@ -116,8 +116,8 @@ float3 DoPBRLight(float3 vWorldPos, float3 vWorldNormal, float3 albedo, float3 v
     //float3 F = Diffuse_OrenNayar(F0, roughness, NV, LN, HV);
 
 	// D - Calculate normal distribution for specular BRDF.
-	//float D = DistributionGGX(N, H, length(Li), roughness);
-    float D = DistributionBlinnPhong(N, H, roughness);
+	float D = DistributionGGX(N, H, length(Li), roughness);
+    //float D = DistributionBlinnPhong(N, H, roughness);
     //float alpha = roughness * roughness;
     //float alphaPrime = clamp(lightRadius / (lenL * 2.0) + alpha, 0.0, 1.0);
     //float D = DistributionTrowbridgeReitz(HN, alpha, alphaPrime);
