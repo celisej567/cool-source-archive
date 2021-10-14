@@ -486,7 +486,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 	// lump_t fix for l4d2 maps
 	if (s_MapHeader.version == 21 && s_MapHeader.lumps[0].fileofs == 0)
 	{
-		DevMsg("Detected l4d2 bsp, fixing lump struct order for compatibility\n");
+		DevMsg("Detected v21 bsp, fixing lump struct order for compatibility\n");
 
 		for (int iLump = 0; iLump < HEADER_LUMPS; iLump++)
 		{
@@ -599,7 +599,7 @@ void CMapLoadHelper::InitFromMemory( model_t *pMapModel, const void *pData, int 
 	// lump_t fix for l4d2 maps
 	if (s_MapHeader.version == 21 && s_MapHeader.lumps[0].fileofs == 0)
 	{
-		DevMsg("Detected l4d2 bsp, fixing lump struct order for compatibility\n");
+		DevMsg("Detected v21 bsp, fixing lump struct order for compatibility\n");
 
 		for (int iLump = 0; iLump < HEADER_LUMPS; iLump++)
 		{
@@ -1176,27 +1176,56 @@ void Mod_LoadWorldlights( CMapLoadHelper &lh, bool bIsHDR )
 		return;
 	}
 
-	if (s_MapHeader.version < BSPVERSION)
+	switch (s_MapHeader.version)
 	{
-		DevMsg("Detected bsp version lower than 21, fixing dworldlight_t struct order for compatibility\n");
-
-		int nOldNumWorldLights = lh.LumpSize() / sizeof(dworldlight_old_t);
-		lh.GetMap()->numworldlights = nOldNumWorldLights;
-		lh.GetMap()->worldlights = (dworldlight_t*)Hunk_AllocName(lh.GetMap()->numworldlights * sizeof(dworldlight_t), va("%s [%s]", lh.GetLoadName(), "worldlights"));
-		for (int iLight = 0; iLight < lh.GetMap()->numworldlights; iLight++)
-		{
-			memcpy(&lh.GetMap()->worldlights[iLight], lh.LumpBase() + iLight * (sizeof(dworldlight_t) - sizeof(Vector)), sizeof(Vector) * 3);
-			lh.GetMap()->worldlights[iLight].shadow_cast_offset = lh.GetMap()->worldlights[iLight].origin;
-			memcpy((byte*)&lh.GetMap()->worldlights[iLight] + sizeof(Vector) * 4, lh.LumpBase() + iLight * (sizeof(dworldlight_t) - sizeof(Vector)) + sizeof(Vector) * 3, sizeof(dworldlight_t) - sizeof(Vector) * 4);
-		}
+	case BSPVERSION:
+	{
+		lh.GetMap()->numworldlights = lh.LumpSize() / sizeof(dworldlight_t);
+		lh.GetMap()->worldlights = (dworldlight_t*)Hunk_AllocName(lh.LumpSize(), va("%s [%s]", lh.GetLoadName(), "worldlights"));
+		memcpy(lh.GetMap()->worldlights, lh.LumpBase(), lh.LumpSize());
+		break;
 	}
-	else
+	case 21:
 	{
-		int nNumWorldLights = lh.LumpSize() / sizeof(dworldlight_t);
-
+		lh.GetMap()->numworldlights = lh.LumpSize() / sizeof(dworldlight_t);
+		lh.GetMap()->worldlights = (dworldlight_t*)Hunk_AllocName(lh.LumpSize(), va("%s [%s]", lh.GetLoadName(), "worldlights"));
+		memcpy(lh.GetMap()->worldlights, lh.LumpBase(), lh.LumpSize());
+		break;
+	}
+	default:
+	{
+		int nNumWorldLights = lh.LumpSize() / sizeof(dworldlight_old_t);
 		lh.GetMap()->numworldlights = nNumWorldLights;
 		lh.GetMap()->worldlights = (dworldlight_t*)Hunk_AllocName(nNumWorldLights * sizeof(dworldlight_t), va("%s [%s]", lh.GetLoadName(), "worldlights"));
+		dworldlight_old_t* RESTRICT pOldWorldLight = reinterpret_cast<dworldlight_old_t*>(lh.LumpBase());
+		dworldlight_t* RESTRICT pNewWorldLight = lh.GetMap()->worldlights;
+
+		for (int i = 0; i < nNumWorldLights; i++)
+		{
+			pNewWorldLight->origin = pOldWorldLight->origin;
+			pNewWorldLight->intensity = pOldWorldLight->intensity;
+			pNewWorldLight->normal = pOldWorldLight->normal;
+			pNewWorldLight->shadow_cast_offset.Init(0.0f, 0.0f, 0.0f);
+			pNewWorldLight->cluster = pOldWorldLight->cluster;
+			pNewWorldLight->type = pOldWorldLight->type;
+			pNewWorldLight->style = pOldWorldLight->style;
+			pNewWorldLight->stopdot = pOldWorldLight->stopdot;
+			pNewWorldLight->stopdot2 = pOldWorldLight->stopdot2;
+			pNewWorldLight->exponent = pOldWorldLight->exponent;
+			pNewWorldLight->radius = pOldWorldLight->radius;
+			pNewWorldLight->constant_attn = pOldWorldLight->constant_attn;
+			pNewWorldLight->linear_attn = pOldWorldLight->linear_attn;
+			pNewWorldLight->quadratic_attn = pOldWorldLight->quadratic_attn;
+			pNewWorldLight->flags = pOldWorldLight->flags;
+			pNewWorldLight->texinfo = pOldWorldLight->texinfo;
+			pNewWorldLight->owner = pOldWorldLight->owner;
+			pNewWorldLight++;
+			pOldWorldLight++;
+		}
+		break;
 	}
+
+}
 #if !defined( SWDS )
 	if ( r_lightcache_zbuffercache.GetInt() )
 	{

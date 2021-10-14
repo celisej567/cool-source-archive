@@ -32,7 +32,7 @@
 #ifdef BSP23
 #define BSPVERSION 23
 #else
-#define BSPVERSION 21
+#define BSPVERSION 22
 #endif
 
 // This needs to match the value in gl_lightmap.h
