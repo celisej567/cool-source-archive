@@ -52,40 +52,24 @@ CCvarSlider::CCvarSlider( Panel *parent, const char *panelName, char const *capt
 //-----------------------------------------------------------------------------
 void CCvarSlider::SetupSlider( float minValue, float maxValue, const char *cvarname, bool bAllowOutOfRange )
 {
-	// make sure min/max don't go outside cvar range if there's one
-	ConVarRef var( cvarname, true );
-	if ( var.IsValid() )
-	{
-		float flCVarMin;
-		if ( var.GetMin( flCVarMin ) )
-		{
-			minValue = m_bUseConVarMinMax ? flCVarMin : MAX( minValue, flCVarMin );
-		}
-		float flCVarMax;
-		if ( var.GetMax( flCVarMax ) )
-		{
-			maxValue = m_bUseConVarMinMax ? flCVarMax : MIN( maxValue, flCVarMax );
-		}
-	}
-
 	m_flMinValue = minValue;
 	m_flMaxValue = maxValue;
 
 	// scale by CVARSLIDER_SCALE_FACTOR
-	SetRange( (int)( CVARSLIDER_SCALE_FACTOR * minValue ), (int)( CVARSLIDER_SCALE_FACTOR * maxValue ) );
+	SetRange((int)(CVARSLIDER_SCALE_FACTOR * minValue), (int)(CVARSLIDER_SCALE_FACTOR * maxValue));
 
-	char szMin[ 32 ];
-	char szMax[ 32 ];
+	char szMin[32];
+	char szMax[32];
 
-	Q_snprintf( szMin, sizeof( szMin ), "%.2f", minValue );
-	Q_snprintf( szMax, sizeof( szMax ), "%.2f", maxValue );
+	Q_snprintf(szMin, sizeof(szMin), "%.2f", minValue);
+	Q_snprintf(szMax, sizeof(szMax), "%.2f", maxValue);
 
-	SetTickCaptions( szMin, szMax );
+	SetTickCaptions(szMin, szMax);
 
-	Q_strncpy( m_szCvarName, cvarname, sizeof( m_szCvarName ) );
+	Q_strncpy(m_szCvarName, cvarname, sizeof(m_szCvarName));
 
-    m_bModifiedOnce = false;
-    m_bAllowOutOfRange = bAllowOutOfRange;
+	m_bModifiedOnce = false;
+	m_bAllowOutOfRange = bAllowOutOfRange;
 
 	// Set slider to current value
 	Reset();

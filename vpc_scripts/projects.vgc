@@ -37,9 +37,19 @@ $Project "glview"
 	"utils\glview\glview.vpc" [$WIN32]
 }
 
-$Project "coolsource" //this is the launcher 
+$Project "launcher" 
 {
 	"launcher\launcher.vpc"
+}
+
+$Project "launcher_main"
+{
+	"launcher_main\launcher_main.vpc"
+}
+
+$Project "gameui"
+{
+	"gameui\gameui.vpc"
 }
 
 $Project "height2normal"

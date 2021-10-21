@@ -9,7 +9,7 @@
 #include "VGuiSystemModuleLoader.h"
 #include "Sys_Utils.h"
 #include "IVguiModule.h"
-#include "ServerBrowser/IServerBrowser.h"
+//#include "ServerBrowser/IServerBrowser.h"
 
 #include <vgui/IPanel.h>
 #include <vgui/ISystem.h>
