@@ -37,19 +37,9 @@ $Project "glview"
 	"utils\glview\glview.vpc" [$WIN32]
 }
 
-$Project "gameui"
-{
-	"gameui\gameui.vpc"
-}
-
-$Project "launcher" 
+$Project "coolsource" //this is the launcher 
 {
 	"launcher\launcher.vpc"
-}
-
-$Project "launcher_main" 
-{
-	"launcher_main\launcher_main.vpc"
 }
 
 $Project "height2normal"
@@ -108,11 +98,6 @@ $Project "scenefilecache"
 $Project "shaderapidx9"
 {
 	"materialsystem\shaderapidx9\shaderapidx9.vpc"
-}
-
-$Project "shaderapidx10"
-{
-	"materialsystem\shaderapidx9\shaderapidx10.vpc"
 }
 
 $Project "shaderapidx11"
