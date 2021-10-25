@@ -220,36 +220,22 @@ static bool ImGui_ImplWin32_UpdateMouseCursor()
 
 static void ImGui_ImplWin32_UpdateMousePos()
 {
-    ImGui_ImplWin32_Data* bd = ImGui_ImplWin32_GetBackendData();
     ImGuiIO& io = ImGui::GetIO();
-    IM_ASSERT(bd->hWnd != 0);
 
-    const ImVec2 mouse_pos_prev = io.MousePos;
-    io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
-
-    // Obtain focused and hovered window. We forward mouse input when focused or when hovered (and no other window is capturing)
-    HWND focused_window = ::GetForegroundWindow();
-    HWND hovered_window = bd->MouseHwnd;
-    HWND mouse_window = NULL;
-    if (hovered_window && (hovered_window == bd->hWnd || ::IsChild(hovered_window, bd->hWnd)))
-        mouse_window = hovered_window;
-    else if (focused_window && (focused_window == bd->hWnd || ::IsChild(focused_window, bd->hWnd)))
-        mouse_window = focused_window;
-    if (mouse_window == NULL)
-        return;
-
-    // Set OS mouse position from Dear ImGui if requested (rarely used, only when ImGuiConfigFlags_NavEnableSetMousePos is enabled by user)
+    // Set OS mouse position if requested (rarely used, only when ImGuiConfigFlags_NavEnableSetMousePos is enabled by user)
     if (io.WantSetMousePos)
     {
-        POINT pos = { (int)mouse_pos_prev.x, (int)mouse_pos_prev.y };
-        if (::ClientToScreen(bd->hWnd, &pos))
-            ::SetCursorPos(pos.x, pos.y);
+        POINT pos = { (int)io.MousePos.x, (int)io.MousePos.y };
+        ::ClientToScreen(GetForegroundWindow(), &pos);
+        ::SetCursorPos(pos.x, pos.y);
     }
 
-    // Set Dear ImGui mouse position from OS position
+    // Set mouse position
+    io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
     POINT pos;
-    if (::GetCursorPos(&pos) && ::ScreenToClient(mouse_window, &pos))
-        io.MousePos = ImVec2((float)pos.x, (float)pos.y);
+    if (::GetActiveWindow() == GetForegroundWindow() && ::GetCursorPos(&pos))
+        if (::ScreenToClient(GetForegroundWindow(), &pos))
+            io.MousePos = ImVec2((float)pos.x, (float)pos.y);
 }
 
 // Gamepad navigation mapping
