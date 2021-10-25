@@ -10,7 +10,6 @@
 #include "xbox/xbox_platform.h"
 #include "xbox/xbox_win32stubs.h"
 #endif
-
 #if !defined( _X360 )
 #include <windows.h>
 #endif
@@ -22,6 +21,12 @@
 
 #include <vgui_controls/ListPanel.h>
 #include <KeyValues.h>
+
+#include "../launcher/ifilesystem.h"
+
+#include <string>
+
+#include "launcher.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -49,6 +54,7 @@ CChangeGameDialog::CChangeGameDialog(vgui::Panel *parent) : Frame(parent, "Chang
 	{
 		m_pModList->SetSingleSelectedItem(m_pModList->GetItemIDFromRow(0));
 	}
+
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +72,7 @@ void CChangeGameDialog::LoadModList()
 	// look for third party games
 	char szSearchPath[_MAX_PATH + 5];
 	Q_strncpy(szSearchPath, "*.*", sizeof( szSearchPath ) );
-
+	
 	// use local filesystem since it has to look outside path system, and will never be used under steam
 	WIN32_FIND_DATA wfd;
 	HANDLE hResult;
@@ -121,7 +127,20 @@ void CChangeGameDialog::LoadModList()
 		FindClose(hResult);
 	}
 }
-
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CON_COMMAND(_setgamedir, "Shutdown and restart the engine.")
+{
+	if (args.ArgC() == 2)
+	{
+		SetGameDirectory(args[1]);
+	}
+	else
+	{
+		Warning("Set the game directory, use for changing game.\n");
+	}
+}
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -134,6 +153,50 @@ void CChangeGameDialog::OnCommand(const char *command)
 			KeyValues *kv = m_pModList->GetItem(m_pModList->GetSelectedItem(0));
 			if (kv)
 			{
+				
+				// HACK IMPLEMENTATION
+				// get the current command line and make it "readable"
+				const char* argv;
+				LPTSTR cmd = GetCommandLine();
+
+				int l = V_strlen(cmd);
+
+				if (cmd == V_strstr(cmd, argv))
+				{
+					cmd = cmd + l;
+					while (*cmd && isspace(*cmd))
+					++cmd;
+				}
+				
+				// convert to char 
+				const char* pGameDirC = kv->GetString("ModDir");
+				char* p_GameDir = V_strdup(pGameDirC);
+				
+				// copy
+				V_strncpy(p_GameDir, kv->GetString("ModDir"), 256);
+				
+				// put all the stuff together
+				std::string mi = std::string(cmd) + " ";
+
+				mi += "-game ";
+				mi += p_GameDir;
+			
+				const char* nMi = mi.c_str();
+				const char* result = nMi;
+
+				// start a new hl2.exe with the changed dir
+				if (!ShellExecute(NULL, "open", "hl2.exe", result, NULL, SW_HIDE))
+				{
+					Error("Failed to change game");
+				}
+
+				// force exit of entire engine
+				engine->ClientCmd_Unrestricted("exit\n");
+
+				// its very clunky and i reckon there's better way than this
+				// but this is the only way i could think of
+
+				/* didnt work
 				// change the game dir and restart the engine
 				char szCmd[256];
 				Q_snprintf(szCmd, sizeof( szCmd ), "_setgamedir %s\n", kv->GetString("ModDir"));
@@ -141,6 +204,7 @@ void CChangeGameDialog::OnCommand(const char *command)
 
 				// Force restart of entire engine
 				engine->ClientCmd_Unrestricted("_restart\n");
+				/*/
 			}
 		}
 	}
@@ -153,9 +217,3 @@ void CChangeGameDialog::OnCommand(const char *command)
 		BaseClass::OnCommand(command);
 	}
 }
-
-
-
-
-
-
