@@ -35,7 +35,7 @@ public:
 	{
 		HKEY hKey;
 		int firstVer = 8;
-		const int lastVer = 14; // Handle up to VS 14, AKA VS 2015
+		const int lastVer = 17; // Handle up to VS 17, AKA VS 2022
 		if ( g_pVPC->Is2010() )
 		{
 			firstVer = 10;
@@ -46,6 +46,7 @@ public:
 		}
 		for ( int vsVer = firstVer; vsVer <= lastVer; ++vsVer )
 		{
+			/*
 			// Handle both VisualStudio and VCExpress (used by some SourceSDK customers)
 			RegStartPoint searchPoints[] =
 			{
@@ -92,6 +93,13 @@ public:
 
 				RegCloseKey( hKey );
 			}
+			*/
+			{
+				char szKeyName[MAX_PATH];
+				DWORD dwKeyNameSize = sizeof(szKeyName);
+				V_strncpy(szSolutionGUID, szKeyName, ARRAYSIZE(szSolutionGUID));
+				return;
+			}
 		}
 		g_pVPC->VPCError( "Unable to find RegKey for .vcproj or .vcxproj files in solutions." );
 	}
@@ -106,7 +114,7 @@ public:
 			pSolutionFilename = szTmpSolutionFilename;
 		}
 
-		Msg( "\nWriting solution file %s.\n\n", pSolutionFilename );
+		ConColorMsg(Color(104,224,18,255), "\nWriting solution file %s.\n\n", pSolutionFilename);
 
 		char szSolutionGUID[256];
 		GetVCPROJSolutionGUID( szSolutionGUID );
@@ -119,13 +127,17 @@ public:
 		if ( !fp )
 			g_pVPC->VPCError( "Can't open %s for writing.", pSolutionFilename );
 
-		
-		if ( g_pVPC->Is2019() )
+		if (g_pVPC->Is2022())
+		{
+			fprintf( fp, "\xef\xbb\xbf\nMicrosoft Visual Studio Solution File, Format Version 12.00\n" ); // anddddd still on 12
+			fprintf( fp, "# Visual Studio 2022\n" );
+		}
+		else if ( g_pVPC->Is2019() )
 		{
 			fprintf( fp, "\xef\xbb\xbf\nMicrosoft Visual Studio Solution File, Format Version 12.00\n" ); // still on 12
 			fprintf( fp, "# Visual Studio 2019\n" );
 		}
-		if ( g_pVPC->Is2015() )
+		else if ( g_pVPC->Is2015() )
 		{
 			fprintf( fp, "\xef\xbb\xbf\nMicrosoft Visual Studio Solution File, Format Version 12.00\n" ); // still on 12
 			fprintf( fp, "# Visual Studio 2015\n" );

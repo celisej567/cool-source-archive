@@ -157,7 +157,7 @@ bool CVPC::Init( int argc, const char **argv )
 		m_nArgc--;
 	}
 
-	Log_Msg( LOG_VPC, "CPC - Cool Project Creator For " );
+	Log_Msg( LOG_VPC, "cVPC - cool Volve Project Creator For " );
 	Log_Msg( LOG_VPC, "Visual Studio " );
 	Log_Msg( LOG_VPC, "(Build: %s %s)\n", __DATE__, __TIME__ );
 	Log_Msg( LOG_VPC, "(C) Copyright 2021, LOLOLOL, All rights reserved.\n" );
@@ -650,6 +650,7 @@ void CVPC::SpewUsage( void )
 			Log_Msg( LOG_VPC, "[/srcctl]:     Enable P4SCC source control integration - can also set environment variable VPC_SRCCTL to 1\n" );
 #endif
 			Log_Msg( LOG_VPC, "[/mirror]:     <path> - Mirror output files to specified path. Used for A:B testing.\n" );
+			Log_Msg( LOG_VPC, "[/2022]:       Generate projects and solutions for Visual Studio 2022\n");
 			Log_Msg( LOG_VPC, "[/2019]:       Generate projects and solutions for Visual Studio 2019 [default]\n" );
 			Log_Msg( LOG_VPC, "[/2015]:       Generate projects and solutions for Visual Studio 2015\n" );
 			Log_Msg( LOG_VPC, "[/2013]:       Generate projects and solutions for Visual Studio 2013\n" );
@@ -1023,6 +1024,11 @@ void CVPC::HandleSingleCommandLineArg( const char *pArg )
 		else if ( !V_stricmp( pArgName, "2019" ) )
 		{
 			m_eVSVersion = k_EVSVersion_2019;
+			m_ExtraOptionsCRCString += pArgName;
+		}	
+		else if ( !V_stricmp( pArgName, "2022" ) )
+		{
+			m_eVSVersion = k_EVSVersion_2022;
 			m_ExtraOptionsCRCString += pArgName;
 		}
 		else if ( !V_stricmp( pArgName, "nounity" ) )
@@ -1847,52 +1853,50 @@ void CVPC::SetMacrosAndConditionals()
 		// VS2010 is strictly win32/xbox360
 		switch ( m_eVSVersion )
 		{
+		case k_EVSVersion_2022:
+			m_ExtraOptionsCRCString += "VS2022";
+			SetConditional("VS2022", true);
+			// temporarily allow VS2013 conditionals also as there are many. Will fix.
+			SetConditional("VS2013", true);
+			m_bUseVS2010FileFormat = true;
+			break;
 		case k_EVSVersion_2019:
 			m_ExtraOptionsCRCString += "VS2019";
 			SetConditional("VS2019", true);
-
 			// temporarily allow VS2013 conditionals also as there are many. Will fix.
 			SetConditional("VS2013", true);
-
 			m_bUseVS2010FileFormat = true;
 			break;
 		case k_EVSVersion_2015:
 			m_ExtraOptionsCRCString += "VS2015";
 			SetConditional( "VS2015", true );
-
 			// temporarily allow VS2013 conditionals also as there are many. Will fix.
 			SetConditional( "VS2013", true );
-
 			m_bUseVS2010FileFormat = true;
 			break;
-
 		case k_EVSVersion_2013:
 			m_ExtraOptionsCRCString += "VS2013";
 			SetConditional( "VS2013", true );
 			m_bUseVS2010FileFormat = true;
 			break;
-
 		case k_EVSVersion_2012:
 			m_ExtraOptionsCRCString += "VS2012";
 			SetConditional( "VS2012", true );
 			m_bUseVS2010FileFormat = true;
 			break;
-
 		case k_EVSVersion_2010:
 			m_ExtraOptionsCRCString += "VS2010";
 			SetConditional( "VS2010", true );
 			m_bUseVS2010FileFormat = true;
 			break;
-
 		case k_EVSVersion_2008:
 			m_ExtraOptionsCRCString += "VS2008";
 			SetConditional( "VS2005", true );			// use 2005 defines
 			m_bUseVS2010FileFormat = false;
 			break;
-
 		default:
-			m_ExtraOptionsCRCString += "VS2005";
-			SetConditional( "VS2005", true );
+			m_ExtraOptionsCRCString += "VS2022";
+			SetConditional( "VS2013", true );
 			m_bUseVS2010FileFormat = false;
 			break;
 		}
@@ -2393,7 +2397,9 @@ void CVPC::SetupGenerators()
 		{
 			// spew what we are generating
 			const char *pchLogLine = "Generating for Visual Studio 2005.\n";
-			if ( m_eVSVersion == k_EVSVersion_2019 )
+			if ( m_eVSVersion == k_EVSVersion_2022 )
+				pchLogLine = "Generating for Visual Studio 2022.\n";
+			else if (m_eVSVersion == k_EVSVersion_2019)
 				pchLogLine = "Generating for Visual Studio 2019.\n";
 			else if (m_eVSVersion == k_EVSVersion_2015)
 				pchLogLine = "Generating for Visual Studio 2015.\n";

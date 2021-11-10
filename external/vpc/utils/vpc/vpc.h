@@ -182,6 +182,7 @@ enum EVSVersion
 	k_EVSVersion_2013,
 	k_EVSVersion_2015,
 	k_EVSVersion_2019,
+	k_EVSVersion_2022,
 };
 
 class CVPC
@@ -219,6 +220,7 @@ public:
 	bool		Is2013()				{ return m_eVSVersion == k_EVSVersion_2013; }	// When this returns true so does Is2010() because of the file format similarities
 	bool		Is2015()				{ return m_eVSVersion == k_EVSVersion_2015; }	// When this returns true so does Is2010() because of the file format similarities
 	bool		Is2019()				{ return m_eVSVersion == k_EVSVersion_2019; }	// When this returns true so does Is2010() because of the file format similarities
+	bool		Is2022()				{ return m_eVSVersion == k_EVSVersion_2022; }	// When this returns true so does Is2010() because of the file format similarities
 	bool		BUse2008()				{ return m_eVSVersion == k_EVSVersion_2008; }
 	bool		IsDedicatedBuild()		{ return m_bDedicatedBuild;	}
 	bool		IsUnity()				{ return m_bUseUnity; }
