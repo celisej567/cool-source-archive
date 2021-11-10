@@ -34,25 +34,6 @@ $Project "inputsystem"
 		$File	"key_translation.cpp"
 		$File	"key_translation.h"
 		$File	"steamcontroller.cpp"
-		$Folder	"ImGui"
-	    {
-		    $File "..\thirdparty\imgui\imconfig.h"
-		    $File "..\thirdparty\imgui\imgui.h"
-		    $File "..\thirdparty\imgui\imgui_internal.h"
-			$File "..\thirdparty\imgui\imstb_rectpack.h"
-			$File "..\thirdparty\imgui\imstb_textedit.h"
-			$File "..\thirdparty\imgui\imstb_truetype.h"
-		    $File "..\thirdparty\imgui\imgui_impl_dx9.h"
-			$File "..\thirdparty\imgui\imgui_impl_win32.h"
-			
-			$File "..\thirdparty\imgui\imgui.cpp"
-			$File "..\thirdparty\imgui\imgui_demo.cpp"
-			$File "..\thirdparty\imgui\imgui_draw.cpp"
-			$File "..\thirdparty\imgui\imgui_tables.cpp"
-			$File "..\thirdparty\imgui\imgui_widgets.cpp"
-			$File "..\thirdparty\imgui\imgui_impl_dx9.cpp"
-			$File "..\thirdparty\imgui\imgui_impl_win32.cpp"
-	    }
 	}
 
 	$Folder	"Public Headers"
@@ -68,6 +49,7 @@ $Project "inputsystem"
 	{
 		$Lib	tier1
 		$Lib	tier2
+		$Lib    imgui
 		$ImpLib SDL2
 		$Implib	"steam_api"						[($WIN32||$WIN64||$POSIX||$PS3)&&!$NO_STEAM]
 	}

@@ -13,7 +13,11 @@
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
 #endif
-
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_dx9.h"
+#include "../imgui/imgui_impl_win32.h"
+#include <d3d9.h>
+#include <tchar.h>
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -91,9 +95,12 @@ void Sys_SetCursorPos(int x, int y)
 static ATOM staticWndclassAtom = 0;
 static WNDCLASS staticWndclass = { NULL };
 #endif
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lparam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+		return true;
 	return DefWindowProc(hwnd,msg,wparam,lparam);
 }
 

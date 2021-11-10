@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "memdbgoff.h"
+#include <corecrt.h>
 
 #ifdef _WIN32
 // ARG: crtdbg is necessary for certain definitions below,
@@ -278,15 +279,15 @@ extern "C"
 		return pMemOut;
 	}
 
-	size_t _msize_base(void* pMem)
-	{
-		return g_pMemAlloc->GetSize(pMem);
-	}
+	//size_t _msize_base(void* pMem)
+	//{
+	//	return g_pMemAlloc->GetSize(pMem);
+	//}
 
-	size_t _msize(void* pMem)
-	{
-		return _msize_base(pMem);
-	}
+	//size_t _msize(void* pMem)
+	//{
+	//	return _msize_base(pMem);
+	//}
 
 	size_t msize(void* pMem)
 	{

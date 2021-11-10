@@ -22,8 +22,8 @@ static void initKeymap(void);
 #include "xbox/xbox_win32stubs.h"
 #endif
 
-#include "../thirdparty/imgui/imgui.h"
-#include "../thirdparty/imgui/imgui_impl_win32.h"
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_win32.h"
 
 ConVar joy_xcontroller_found( "joy_xcontroller_found", "1", FCVAR_HIDDEN, "Automatically set to 1 if an xcontroller has been detected." );
 
@@ -1271,8 +1271,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 //-----------------------------------------------------------------------------
 LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	/*if*/ (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam));
-	//	return true;
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
+		return true;
 
 #if defined( PLATFORM_WINDOWS ) // We use this even for SDL to handle mouse move.
 	if ( !m_bEnabled )

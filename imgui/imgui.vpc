@@ -1,0 +1,67 @@
+//-----------------------------------------------------------------------------
+//	IMGUI.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$macro SRCDIR		".."
+$Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+
+$include "$SRCDIR\vpc_scripts\source_lib_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;..\imgui\"
+		$PreprocessorDefinitions		"$BASE;IMGUI_LIB"
+	}
+
+}
+
+$Configuration "Debug"
+{
+	$Linker [$X360]
+	{
+		$AdditionalDependencies			"$BASE Xonlined.lib"
+	}
+}
+
+$Configuration "Release"
+{
+	$Linker [$X360]
+	{
+		$AdditionalDependencies			"$BASE Xonline.lib"
+	}
+}
+
+$Project "ImGui"
+{
+	$Folder	"Source Files"
+	{	
+		$File "..\imgui\imgui.cpp"
+		$File "..\imgui\imgui_demo.cpp"
+		$File "..\imgui\imgui_draw.cpp"
+		$File "..\imgui\imgui_tables.cpp"
+		$File "..\imgui\imgui_widgets.cpp"
+		$File "..\imgui\imgui_impl_dx9.cpp"
+		$File "..\imgui\imgui_impl_win32.cpp"
+	}
+
+	$Folder	"Header Files"
+	{		
+	    $File "..\imgui\imconfig.h"
+	    $File "..\imgui\imgui.h"
+	    $File "..\imgui\imgui_internal.h"
+		$File "..\imgui\imstb_rectpack.h"
+		$File "..\imgui\imstb_textedit.h"
+		$File "..\imgui\imstb_truetype.h"
+	    $File "..\imgui\imgui_impl_dx9.h"
+		$File "..\imgui\imgui_impl_win32.h"
+	}
+
+	$Folder	"Public Header Files"
+	{
+	}
+
+}

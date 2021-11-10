@@ -56,6 +56,7 @@
 #include "reslistgenerator.h"
 #include "tier1/fmtstr.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include "convar.h"
 
 #define VERSION_SAFE_STEAM_API_INTERFACES
 #include "steam/steam_api.h"
@@ -1175,7 +1176,7 @@ static const char *BuildCommand()
 // Output : int APIENTRY
 //-----------------------------------------------------------------------------
 #ifdef WIN32
-extern "C" __declspec(dllexport) int LauncherMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+extern "C" __declspec(dllexport) int LauncherMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 #else
 DLL_EXPORT int LauncherMain( int argc, char **argv )
 #endif
@@ -1368,7 +1369,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		{
 			// Allow the user to explicitly say they want to be able to run multiple instances of the source mutex.
 			// Useful for side-by-side comparisons of different renderers.
-			bool multiRun = CommandLine()->CheckParm( "-multirun" ) != NULL;
+			// bool multiRun = CommandLine()->CheckParm( "-multirun" ) != NULL;
 
 			// We're going to hijack the existing session and load a new savegame into it. This will mainly occur when users click on links in Bugzilla that will automatically copy saves and load them
 			// directly from the web browser. The -hijack command prevents the launcher from objecting that there is already an instance of the game.
@@ -1405,6 +1406,8 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 					free((void *)szCommand);
 				}
 			}
+			// Allow multirunning all time, need this for changing game "in instance"
+			/*
 			else
 			{
 				if (!multiRun) {
@@ -1415,6 +1418,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			if (!multiRun) {
 				return retval;
 			}
+			*/
 		}
 	}
 #elif defined( POSIX )

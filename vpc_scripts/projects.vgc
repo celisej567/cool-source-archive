@@ -80,6 +80,10 @@ $Project "phonemeextractor"
 	"utils\phonemeextractor\phonemeextractor.vpc" [$WIN32]
 }
 
+$Project "imgui"
+{
+	"imgui\imgui.vpc" 
+}
 $Project "particles"
 {
 	"particles\particles.vpc" 
