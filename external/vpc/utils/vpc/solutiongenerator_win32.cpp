@@ -46,7 +46,7 @@ public:
 		}
 		for ( int vsVer = firstVer; vsVer <= lastVer; ++vsVer )
 		{
-			/*
+			
 			// Handle both VisualStudio and VCExpress (used by some SourceSDK customers)
 			RegStartPoint searchPoints[] =
 			{
@@ -60,8 +60,8 @@ public:
 				char pRegKeyName[1000];
 				V_snprintf( pRegKeyName, ARRAYSIZE(pRegKeyName), searchPoint.baseDir, vsVer );
 				LONG ret = RegOpenKeyEx( searchPoint.baseKey, pRegKeyName, 0, KEY_READ, &hKey );
-				//if ( ret != ERROR_SUCCESS )
-				//	g_pVPC->VPCError( "Unable to open registry key %s.", pRegKeyName );
+				if ( ret != ERROR_SUCCESS )
+					g_pVPC->VPCError( "Unable to open registry key %s.", pRegKeyName );
 
 				for ( int i=0; i < 200; i++ )
 				{
@@ -93,13 +93,13 @@ public:
 
 				RegCloseKey( hKey );
 			}
-			*/
-			{
-				char szKeyName[MAX_PATH];
-				DWORD dwKeyNameSize = sizeof(szKeyName);
-				V_strncpy(szSolutionGUID, szKeyName, ARRAYSIZE(szSolutionGUID));
-				return;
-			}
+			
+			//{
+			//	char szKeyName[MAX_PATH];
+			//	DWORD dwKeyNameSize = sizeof(szKeyName);
+			//	V_strncpy(szSolutionGUID, szKeyName, ARRAYSIZE(szSolutionGUID));
+			//	return;
+			//}
 		}
 		g_pVPC->VPCError( "Unable to find RegKey for .vcproj or .vcxproj files in solutions." );
 	}
