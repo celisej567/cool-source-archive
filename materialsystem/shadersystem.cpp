@@ -702,6 +702,8 @@ void CShaderSystem::SetupShaderDictionary( int nShaderDLLIndex )
 #endif
 		
 		// Make sure it doesn't try to override another shader DLL's names.
+		// ^^^ Fuck this and let everyone override shaders
+		/*
 		if ( info.m_bModShaderDLL )
 		{
 			for ( int iTestDLL=0; iTestDLL < m_ShaderDLLs.Count(); iTestDLL++ )
@@ -717,6 +719,7 @@ void CShaderSystem::SetupShaderDictionary( int nShaderDLLIndex )
 				}
 			}
 		}
+		*/
 
 		info.m_ShaderDict.Insert( pShaderName, pShader );
 	}
