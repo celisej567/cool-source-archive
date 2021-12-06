@@ -418,6 +418,8 @@ int CMapLoadHelper::GetRefCount()
 	return s_nMapLoadRecursion;
 }
 
+int bspver;
+
 //-----------------------------------------------------------------------------
 // Setup a BSP loading context, maintains a ref count.	
 //-----------------------------------------------------------------------------
@@ -480,6 +482,8 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 #ifndef SWDS
 	InitDLightGlobals( s_MapHeader.version );
 #endif
+
+	bspver = s_MapHeader.version;
 
 	s_pMap = &g_ModelLoader.m_worldBrushData;
 
@@ -547,6 +551,11 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 		}
 	}
 #endif
+}
+
+int GetBSPVersion()
+{
+	return bspver;
 }
 
 //-----------------------------------------------------------------------------
@@ -1225,7 +1234,7 @@ void Mod_LoadWorldlights( CMapLoadHelper &lh, bool bIsHDR )
 		break;
 	}
 
-}
+    }
 #if !defined( SWDS )
 	if ( r_lightcache_zbuffercache.GetInt() )
 	{

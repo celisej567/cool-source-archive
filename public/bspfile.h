@@ -67,48 +67,48 @@
 // Common limits
 // leaffaces, leafbrushes, planes, and verts are still bounded by
 // 16 bit short limits
-#define	MAX_MAP_MODELS					1024
-#define	MAX_MAP_BRUSHES					8192
-#define	MAX_MAP_ENTITIES				8192
-#define	MAX_MAP_TEXINFO					12288
-#define MAX_MAP_TEXDATA					2048
-#define MAX_MAP_DISPINFO				16384
-#define MAX_MAP_DISP_VERTS				( MAX_MAP_DISPINFO * ((1<<MAX_MAP_DISP_POWER)+1) * ((1<<MAX_MAP_DISP_POWER)+1) )
-#define MAX_MAP_DISP_TRIS				( (1 << MAX_MAP_DISP_POWER) * (1 << MAX_MAP_DISP_POWER) * 2 )
-#define MAX_DISPVERTS					NUM_DISP_POWER_VERTS( MAX_MAP_DISP_POWER )
-#define MAX_DISPTRIS					NUM_DISP_POWER_TRIS( MAX_MAP_DISP_POWER )
+#define	MAX_MAP_MODELS					1024	
+#define	MAX_MAP_BRUSHES					8192	
+#define	MAX_MAP_ENTITIES				8192	
+#define	MAX_MAP_TEXINFO					12288	
+#define MAX_MAP_TEXDATA					2048	
+#define MAX_MAP_DISPINFO				16384	
+#define MAX_MAP_DISP_VERTS				( MAX_MAP_DISPINFO * ((1<<MAX_MAP_DISP_POWER)+1) * ((1<<MAX_MAP_DISP_POWER)+1) )	
+#define MAX_MAP_DISP_TRIS				( (1 << MAX_MAP_DISP_POWER) * (1 << MAX_MAP_DISP_POWER) * 2 )	
+#define MAX_DISPVERTS					NUM_DISP_POWER_VERTS( MAX_MAP_DISP_POWER )	
+#define MAX_DISPTRIS					NUM_DISP_POWER_TRIS( MAX_MAP_DISP_POWER )	
 #define	MAX_MAP_AREAS					256
-#define MAX_MAP_AREA_BYTES				(MAX_MAP_AREAS/8)
-#define	MAX_MAP_AREAPORTALS				1024
-// Planes come in pairs, thus an even number.
+#define MAX_MAP_AREA_BYTES				(MAX_MAP_AREAS/8)	
+#define	MAX_MAP_AREAPORTALS				1024	
+// Planes come in pairs, thus an even number.	
 #define	MAX_MAP_PLANES					65536
 #define	MAX_MAP_NODES					65536
 #define	MAX_MAP_BRUSHSIDES				65536
 #define	MAX_MAP_LEAFS					65536
 #define	MAX_MAP_VERTS					65536
-#define MAX_MAP_VERTNORMALS				256000
+#define MAX_MAP_VERTNORMALS				256000	
 #define MAX_MAP_VERTNORMALINDICES		256000
 #define	MAX_MAP_FACES					65536
 #define	MAX_MAP_LEAFFACES				65536
 #define	MAX_MAP_LEAFBRUSHES 			65536
-#define	MAX_MAP_PORTALS					65536
-#define MAX_MAP_CLUSTERS				65536
-#define MAX_MAP_LEAFWATERDATA			32768
-#define MAX_MAP_PORTALVERTS				128000
+#define	MAX_MAP_PORTALS					65536	
+#define MAX_MAP_CLUSTERS				65536	
+#define MAX_MAP_LEAFWATERDATA			32768	
+#define MAX_MAP_PORTALVERTS				128000	
 #define	MAX_MAP_EDGES					256000
-#define	MAX_MAP_SURFEDGES				512000
+#define	MAX_MAP_SURFEDGES				512000	
 #define	MAX_MAP_LIGHTING				0x1000000
 #define	MAX_MAP_VISIBILITY				0x1000000			// increased BSPVERSION 7
-#define	MAX_MAP_TEXTURES				1024
-#define MAX_MAP_WORLDLIGHTS				8192
-#define MAX_MAP_CUBEMAPSAMPLES			1024
-#define MAX_MAP_OVERLAYS				512 
-#define MAX_MAP_WATEROVERLAYS			16384
-#define MAX_MAP_TEXDATA_STRING_DATA		256000
-#define MAX_MAP_TEXDATA_STRING_TABLE	65536
-// this is stuff for trilist/tristrips, etc.
-#define MAX_MAP_PRIMITIVES				32768
-#define MAX_MAP_PRIMVERTS				65536
+#define	MAX_MAP_TEXTURES				1024	
+#define MAX_MAP_WORLDLIGHTS				8192	
+#define MAX_MAP_CUBEMAPSAMPLES			1024	
+#define MAX_MAP_OVERLAYS				512 	
+#define MAX_MAP_WATEROVERLAYS			16384	
+#define MAX_MAP_TEXDATA_STRING_DATA		256000	
+#define MAX_MAP_TEXDATA_STRING_TABLE	65536	
+// this is stuff for trilist/tristrips, etc.	
+#define MAX_MAP_PRIMITIVES				32768	
+#define MAX_MAP_PRIMVERTS				65536	
 #define MAX_MAP_PRIMINDICES				65536
 
 #else
@@ -393,6 +393,7 @@ struct lump_t
 
 struct lump_21_t
 {
+	DECLARE_BYTESWAP_DATADESC();
 	int	version;
 	int		fileofs, filelen;
 	char	fourCC[4];
@@ -726,36 +727,36 @@ struct dface_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	unsigned short	planenum;
-	byte		side;	// faces opposite to the node's plane direction
-	byte		onNode; // 1 of on node, 0 if in leaf
+	byte		side;	// faces opposite to the node's plane direction	
+	byte		onNode; // 1 of on node, 0 if in leaf	
 
 	int			firstedge;		// we must support > 64k edges
 	short		numedges;	
 	short		texinfo;
-	// This is a union under the assumption that a fog volume boundary (ie. water surface)
-	// isn't a displacement map.
-	// FIXME: These should be made a union with a flags or type field for which one it is
-	// if we can add more to this.
-//	union
-//	{
+	// This is a union under the assumption that a fog volume boundary (ie. water surface)	
+	// isn't a displacement map.	
+	// FIXME: These should be made a union with a flags or type field for which one it is	
+	// if we can add more to this.	
+//	union	
+//	{	
 	    short       dispinfo;
-		// This is only for surfaces that are the boundaries of fog volumes
-		// (ie. water surfaces)
-		// All of the rest of the surfaces can look at their leaf to find out
-		// what fog volume they are in.
+	// This is only for surfaces that are the boundaries of fog volumes	
+	// (ie. water surfaces)	
+	// All of the rest of the surfaces can look at their leaf to find out	
+	// what fog volume they are in.	
 		short		surfaceFogVolumeID;
-//	};
+	//	};	
 
-	// lighting info
+		// lighting info	
 	byte		styles[MAXLIGHTMAPS];
-	int			lightofs;		// start of [numstyles*surfsize] samples
-    float       area;
+	int			lightofs;		// start of [numstyles*surfsize] samples	
+	float       area;
 
-	// TODO: make these unsigned chars?
+	// TODO: make these unsigned chars?	
 	int			m_LightmapTextureMinsInLuxels[2];
 	int			m_LightmapTextureSizeInLuxels[2];
 
-	int origFace;				// reference the original face this face was derived from
+	int origFace;				// reference the original face this face was derived from	
 
 
 public:
@@ -763,15 +764,15 @@ public:
 	unsigned short GetNumPrims() const;
 	void SetNumPrims( unsigned short nPrims );
 	bool AreDynamicShadowsEnabled();
-	void SetDynamicShadowsEnabled( bool bEnabled );
+	void SetDynamicShadowsEnabled(bool bEnabled);
 
-	// non-polygon primitives (strips and lists)
+	// non-polygon primitives (strips and lists)	
 private:
 	unsigned short m_NumPrims;	// Top bit, if set, disables shadows on this surface (this is why there are accessors).
 
 public:
 	unsigned short	firstPrimID; 
-	
+
 	unsigned int	smoothingGroups;
 };
 
@@ -820,11 +821,11 @@ struct dfaceid_t
 struct dleaf_version_0_t
 {
 	DECLARE_BYTESWAP_DATADESC();
-	int				contents;			// OR of all brushes (not needed?)
+	int				contents;			// OR of all brushes (not needed?)	
 
 	short			cluster;
 
-	BEGIN_BITFIELD( bf );
+	BEGIN_BITFIELD(bf);
 	short			area:9;
 	short			flags:7;			// Per leaf flags.
 	END_BITFIELD();
@@ -839,7 +840,7 @@ struct dleaf_version_0_t
 	unsigned short	numleafbrushes;
 	short			leafWaterDataID; // -1 for not in water
 
-	// Precaculated light info for entities.
+	// Precaculated light info for entities.	
 	CompressedLightCube m_AmbientLighting;
 };
 
@@ -847,11 +848,11 @@ struct dleaf_version_0_t
 struct dleaf_t
 {
 	DECLARE_BYTESWAP_DATADESC();
-	int				contents;			// OR of all brushes (not needed?)
+	int				contents;			// OR of all brushes (not needed?)	
 
 	short			cluster;
 
-	BEGIN_BITFIELD( bf );
+	BEGIN_BITFIELD(bf);
 	short			area:9;
 	short			flags:7;			// Per leaf flags.
 	END_BITFIELD();
@@ -866,8 +867,8 @@ struct dleaf_t
 	unsigned short	numleafbrushes;
 	short			leafWaterDataID; // -1 for not in water
 
-	// NOTE: removed this for version 1 and moved into separate lump "LUMP_LEAF_AMBIENT_LIGHTING" or "LUMP_LEAF_AMBIENT_LIGHTING_HDR"
-	// Precaculated light info for entities.
+	// NOTE: removed this for version 1 and moved into separate lump "LUMP_LEAF_AMBIENT_LIGHTING" or "LUMP_LEAF_AMBIENT_LIGHTING_HDR"	
+	// Precaculated light info for entities.	
 //	CompressedLightCube m_AmbientLighting;
 };
 #pragma warning( default:4201 )	// C4201: nonstandard extension used: nameless struct/union
@@ -959,7 +960,7 @@ struct dleafwaterdata_t
 	DECLARE_BYTESWAP_DATADESC();
 	float	surfaceZ;
 	float	minZ;
-	short	surfaceTexInfoID;
+	 short	surfaceTexInfoID;
 };
 
 class CFaceMacroTextureInfo
@@ -1053,7 +1054,7 @@ struct doverlay_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	int			nId;
-	short		nTexInfo;
+	 short		nTexInfo;
 
 	// Accessors..
 	void			SetFaceCount(unsigned short count);

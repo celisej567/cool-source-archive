@@ -1392,6 +1392,8 @@ void UnserializeLump<StaticPropLump_t>(StaticPropLump_t* _output, CUtlBuffer& bu
 	buf.Get(_output, sizeof(StaticPropLump_t));
 }
 
+extern int GetBSPVersion();
+
 void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 {
 	// Version check
@@ -1419,16 +1421,28 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 			case 7: UnserializeLump<StaticPropLumpV7_t>(&lump, buf); break;
 			case 8: UnserializeLump<StaticPropLumpV8_t>(&lump, buf); break;
 			case 9: UnserializeLump<StaticPropLumpV9_t>(&lump, buf); break;
-			case 10: UnserializeLump<StaticPropLumpV10_t>(&lump, buf); break;
+			case 10:
+			{
+				if (GetBSPVersion() == 20)
+				{
+					UnserializeLump<StaticPropLumpV7_TF2_t>(&lump, buf);
+					break;
+				}
+				else
+				{
+					UnserializeLump<StaticPropLumpV7_t>(&lump, buf);
+					break;
+				}
+			}
 			case 11: UnserializeLump<StaticPropLumpV11_t>(&lump, buf); break;
 			case 12: UnserializeLump<StaticPropLump_t>(&lump, buf); break;
 
 				break;
 			default:
-				Assert("Unexpected version while deserializing lumps.");
+				Error("Unexpected version while deserializing lumps.");
 		}
 
-		m_StaticProps[i].Init( i, lump, m_StaticPropDict[lump.m_PropType].m_pModel );
+		m_StaticProps[i].Init(i, lump, m_StaticPropDict[lump.m_PropType].m_pModel);
 
 		// For distance-based fading, keep a list of the things that need
 		// to be faded out. Not sure if this is the optimal way of doing it

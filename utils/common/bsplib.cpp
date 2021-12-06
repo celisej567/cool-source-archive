@@ -28,6 +28,7 @@
 #include "vtf/vtf.h"
 #include "lzma/lzma.h"
 #include "tier1/lzmaDecoder.h"
+#include "../vbsp/vbsp.h"
 
 //=============================================================================
 
@@ -48,6 +49,13 @@ BEGIN_BYTESWAP_DATADESC( lump_t )
 	DEFINE_FIELD( filelen, FIELD_INTEGER ),
 	DEFINE_FIELD( version, FIELD_INTEGER ),
 	DEFINE_FIELD( uncompressedSize, FIELD_INTEGER ),
+END_BYTESWAP_DATADESC()
+
+BEGIN_BYTESWAP_DATADESC( lump_21_t )
+    DEFINE_FIELD( fileofs, FIELD_INTEGER ),
+    DEFINE_FIELD( filelen, FIELD_INTEGER ),
+	DEFINE_FIELD( version, FIELD_INTEGER ),
+	DEFINE_ARRAY( fourCC, FIELD_CHARACTER, 4),
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( dflagslump_t )
@@ -291,6 +299,26 @@ BEGIN_BYTESWAP_DATADESC( dworldlight_t )
 	DEFINE_FIELD( owner, FIELD_INTEGER ),
 END_BYTESWAP_DATADESC()
 
+
+BEGIN_BYTESWAP_DATADESC(dworldlight_old_t)
+    DEFINE_FIELD(origin, FIELD_VECTOR),
+	DEFINE_FIELD(intensity, FIELD_VECTOR),
+	DEFINE_FIELD(normal, FIELD_VECTOR),
+	DEFINE_FIELD(cluster, FIELD_INTEGER),
+	DEFINE_FIELD(type, FIELD_INTEGER),	// enumeration
+	DEFINE_FIELD(style, FIELD_INTEGER),
+	DEFINE_FIELD(stopdot, FIELD_FLOAT),
+	DEFINE_FIELD(stopdot2, FIELD_FLOAT),
+	DEFINE_FIELD(exponent, FIELD_FLOAT),
+	DEFINE_FIELD(radius, FIELD_FLOAT),
+	DEFINE_FIELD(constant_attn, FIELD_FLOAT),
+	DEFINE_FIELD(linear_attn, FIELD_FLOAT),
+	DEFINE_FIELD(quadratic_attn, FIELD_FLOAT),
+	DEFINE_FIELD(flags, FIELD_INTEGER),
+	DEFINE_FIELD(texinfo, FIELD_INTEGER),
+	DEFINE_FIELD(owner, FIELD_INTEGER),
+END_BYTESWAP_DATADESC()
+
 BEGIN_BYTESWAP_DATADESC( dleafwaterdata_t )
 	DEFINE_FIELD( surfaceZ, FIELD_FLOAT ),
 	DEFINE_FIELD( minZ, FIELD_FLOAT ),
@@ -366,51 +394,175 @@ BEGIN_BYTESWAP_DATADESC( StaticPropDictLump_t )
 	DEFINE_ARRAY( m_Name, FIELD_CHARACTER, STATIC_PROP_NAME_LENGTH ),
 END_BYTESWAP_DATADESC()
 
-BEGIN_BYTESWAP_DATADESC( StaticPropLump_t )
-	DEFINE_FIELD( m_Origin, FIELD_VECTOR ),
-	DEFINE_FIELD( m_Angles, FIELD_VECTOR ),	// QAngle
-	DEFINE_FIELD( m_PropType, FIELD_SHORT ),
-	DEFINE_FIELD( m_FirstLeaf, FIELD_SHORT ),
-	DEFINE_FIELD( m_LeafCount, FIELD_SHORT ),
-	DEFINE_FIELD( m_Solid, FIELD_CHARACTER ),
-	DEFINE_FIELD( m_Flags, FIELD_CHARACTER ),
-	DEFINE_FIELD( m_Skin, FIELD_INTEGER ),
-	DEFINE_FIELD( m_FadeMinDist, FIELD_FLOAT ),
-	DEFINE_FIELD( m_FadeMaxDist, FIELD_FLOAT ),
-	DEFINE_FIELD( m_LightingOrigin, FIELD_VECTOR ),
-	DEFINE_FIELD( m_flForcedFadeScale, FIELD_FLOAT ),
-	DEFINE_FIELD( m_nMinDXLevel, FIELD_SHORT ),
-	DEFINE_FIELD( m_nMaxDXLevel, FIELD_SHORT ),
+// version 11
+BEGIN_BYTESWAP_DATADESC(StaticPropLump_t)
+DEFINE_FIELD(m_Origin, FIELD_VECTOR),
+DEFINE_FIELD(m_Angles, FIELD_VECTOR),	// QAngle
+DEFINE_FIELD(m_PropType, FIELD_SHORT),
+DEFINE_FIELD(m_FirstLeaf, FIELD_SHORT),
+DEFINE_FIELD(m_LeafCount, FIELD_SHORT),
+DEFINE_FIELD(m_Solid, FIELD_CHARACTER),
+DEFINE_FIELD(m_Flags, FIELD_CHARACTER),
+DEFINE_FIELD(m_Skin, FIELD_INTEGER),
+DEFINE_FIELD(m_FadeMinDist, FIELD_FLOAT),
+DEFINE_FIELD(m_FadeMaxDist, FIELD_FLOAT),
+DEFINE_FIELD(m_LightingOrigin, FIELD_VECTOR),
+DEFINE_FIELD(m_flForcedFadeScale, FIELD_FLOAT),
+DEFINE_FIELD(m_nMinDXLevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMaxDXLevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_DiffuseModulation, FIELD_COLOR32),
+DEFINE_FIELD(m_Flags, FIELD_INTEGER),
+DEFINE_FIELD(m_Scale, FIELD_INTEGER),
 END_BYTESWAP_DATADESC()
 
-BEGIN_BYTESWAP_DATADESC( StaticPropLumpV4_t )
-	DEFINE_FIELD( m_Origin, FIELD_VECTOR ),
-	DEFINE_FIELD( m_Angles, FIELD_VECTOR ),	// QAngle
-	DEFINE_FIELD( m_PropType, FIELD_SHORT ),
-	DEFINE_FIELD( m_FirstLeaf, FIELD_SHORT ),
-	DEFINE_FIELD( m_LeafCount, FIELD_SHORT ),
-	DEFINE_FIELD( m_Solid, FIELD_CHARACTER ),
-	DEFINE_FIELD( m_Flags, FIELD_CHARACTER ),
-	DEFINE_FIELD( m_Skin, FIELD_INTEGER ),
-	DEFINE_FIELD( m_FadeMinDist, FIELD_FLOAT ),
-	DEFINE_FIELD( m_FadeMaxDist, FIELD_FLOAT ),
-	DEFINE_FIELD( m_LightingOrigin, FIELD_VECTOR ),
+BEGIN_BYTESWAP_DATADESC(StaticPropLumpV4_t)
+DEFINE_FIELD(m_Origin, FIELD_VECTOR),
+DEFINE_FIELD(m_Angles, FIELD_VECTOR),	// QAngle
+DEFINE_FIELD(m_PropType, FIELD_SHORT),
+DEFINE_FIELD(m_FirstLeaf, FIELD_SHORT),
+DEFINE_FIELD(m_LeafCount, FIELD_SHORT),
+DEFINE_FIELD(m_Solid, FIELD_CHARACTER),
+DEFINE_FIELD(m_Flags, FIELD_CHARACTER),
+DEFINE_FIELD(m_Skin, FIELD_INTEGER),
+DEFINE_FIELD(m_FadeMinDist, FIELD_FLOAT),
+DEFINE_FIELD(m_FadeMaxDist, FIELD_FLOAT),
+DEFINE_FIELD(m_LightingOrigin, FIELD_VECTOR),
 END_BYTESWAP_DATADESC()
 
-BEGIN_BYTESWAP_DATADESC( StaticPropLumpV5_t )
-	DEFINE_FIELD( m_Origin, FIELD_VECTOR ),
-	DEFINE_FIELD( m_Angles, FIELD_VECTOR ),	// QAngle
-	DEFINE_FIELD( m_PropType, FIELD_SHORT ),
-	DEFINE_FIELD( m_FirstLeaf, FIELD_SHORT ),
-	DEFINE_FIELD( m_LeafCount, FIELD_SHORT ),
-	DEFINE_FIELD( m_Solid, FIELD_CHARACTER ),
-	DEFINE_FIELD( m_Flags, FIELD_CHARACTER ),
-	DEFINE_FIELD( m_Skin, FIELD_INTEGER ),
-	DEFINE_FIELD( m_FadeMinDist, FIELD_FLOAT ),
-	DEFINE_FIELD( m_FadeMaxDist, FIELD_FLOAT ),
-	DEFINE_FIELD( m_LightingOrigin, FIELD_VECTOR ),
-	DEFINE_FIELD( m_flForcedFadeScale, FIELD_FLOAT ),
+BEGIN_BYTESWAP_DATADESC(StaticPropLumpV5_t)
+DEFINE_FIELD(m_Origin, FIELD_VECTOR),
+DEFINE_FIELD(m_Angles, FIELD_VECTOR),	// QAngle
+DEFINE_FIELD(m_PropType, FIELD_SHORT),
+DEFINE_FIELD(m_FirstLeaf, FIELD_SHORT),
+DEFINE_FIELD(m_LeafCount, FIELD_SHORT),
+DEFINE_FIELD(m_Solid, FIELD_CHARACTER),
+DEFINE_FIELD(m_Flags, FIELD_CHARACTER),
+DEFINE_FIELD(m_Skin, FIELD_INTEGER),
+DEFINE_FIELD(m_FadeMinDist, FIELD_FLOAT),
+DEFINE_FIELD(m_FadeMaxDist, FIELD_FLOAT),
+DEFINE_FIELD(m_LightingOrigin, FIELD_VECTOR),
+DEFINE_FIELD(m_flForcedFadeScale, FIELD_FLOAT),
 END_BYTESWAP_DATADESC()
+
+BEGIN_BYTESWAP_DATADESC(StaticPropLumpV6_t)
+DEFINE_FIELD(m_Origin, FIELD_VECTOR),
+DEFINE_FIELD(m_Angles, FIELD_VECTOR),	// QAngle
+DEFINE_FIELD(m_PropType, FIELD_SHORT),
+DEFINE_FIELD(m_FirstLeaf, FIELD_SHORT),
+DEFINE_FIELD(m_LeafCount, FIELD_SHORT),
+DEFINE_FIELD(m_Solid, FIELD_CHARACTER),
+DEFINE_FIELD(m_Flags, FIELD_CHARACTER),
+DEFINE_FIELD(m_Skin, FIELD_INTEGER),
+DEFINE_FIELD(m_FadeMinDist, FIELD_FLOAT),
+DEFINE_FIELD(m_FadeMaxDist, FIELD_FLOAT),
+DEFINE_FIELD(m_LightingOrigin, FIELD_VECTOR),
+DEFINE_FIELD(m_flForcedFadeScale, FIELD_FLOAT),
+DEFINE_FIELD(m_nMinDXLevel, FIELD_SHORT),
+DEFINE_FIELD(m_nMaxDXLevel, FIELD_SHORT),
+END_BYTESWAP_DATADESC()
+
+BEGIN_BYTESWAP_DATADESC(StaticPropLumpV7_t)
+DEFINE_FIELD(m_Origin, FIELD_VECTOR),
+DEFINE_FIELD(m_Angles, FIELD_VECTOR),	// QAngle
+DEFINE_FIELD(m_PropType, FIELD_SHORT),
+DEFINE_FIELD(m_FirstLeaf, FIELD_SHORT),
+DEFINE_FIELD(m_LeafCount, FIELD_SHORT),
+DEFINE_FIELD(m_Solid, FIELD_CHARACTER),
+DEFINE_FIELD(m_Flags, FIELD_CHARACTER),
+DEFINE_FIELD(m_Skin, FIELD_INTEGER),
+DEFINE_FIELD(m_FadeMinDist, FIELD_FLOAT),
+DEFINE_FIELD(m_FadeMaxDist, FIELD_FLOAT),
+DEFINE_FIELD(m_LightingOrigin, FIELD_VECTOR),
+DEFINE_FIELD(m_flForcedFadeScale, FIELD_FLOAT),
+DEFINE_FIELD(m_nMinDXLevel, FIELD_SHORT),
+DEFINE_FIELD(m_nMaxDXLevel, FIELD_SHORT),
+DEFINE_FIELD(m_DiffuseModulation, FIELD_COLOR32),
+END_BYTESWAP_DATADESC()
+
+BEGIN_BYTESWAP_DATADESC(StaticPropLumpV8_t)
+DEFINE_FIELD(m_Origin, FIELD_VECTOR),
+DEFINE_FIELD(m_Angles, FIELD_VECTOR),	// QAngle
+DEFINE_FIELD(m_PropType, FIELD_SHORT),
+DEFINE_FIELD(m_FirstLeaf, FIELD_SHORT),
+DEFINE_FIELD(m_LeafCount, FIELD_SHORT),
+DEFINE_FIELD(m_Solid, FIELD_CHARACTER),
+DEFINE_FIELD(m_Flags, FIELD_CHARACTER),
+DEFINE_FIELD(m_Skin, FIELD_INTEGER),
+DEFINE_FIELD(m_FadeMinDist, FIELD_FLOAT),
+DEFINE_FIELD(m_FadeMaxDist, FIELD_FLOAT),
+DEFINE_FIELD(m_LightingOrigin, FIELD_VECTOR),
+DEFINE_FIELD(m_flForcedFadeScale, FIELD_FLOAT),
+DEFINE_FIELD(m_nMinCPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinCPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinGPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinGPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_DiffuseModulation, FIELD_COLOR32),
+END_BYTESWAP_DATADESC()
+
+BEGIN_BYTESWAP_DATADESC(StaticPropLumpV9_t)
+DEFINE_FIELD(m_Origin, FIELD_VECTOR),
+DEFINE_FIELD(m_Angles, FIELD_VECTOR),	// QAngle
+DEFINE_FIELD(m_PropType, FIELD_SHORT),
+DEFINE_FIELD(m_FirstLeaf, FIELD_SHORT),
+DEFINE_FIELD(m_LeafCount, FIELD_SHORT),
+DEFINE_FIELD(m_Solid, FIELD_CHARACTER),
+DEFINE_FIELD(m_Flags, FIELD_CHARACTER),
+DEFINE_FIELD(m_Skin, FIELD_INTEGER),
+DEFINE_FIELD(m_FadeMinDist, FIELD_FLOAT),
+DEFINE_FIELD(m_FadeMaxDist, FIELD_FLOAT),
+DEFINE_FIELD(m_LightingOrigin, FIELD_VECTOR),
+DEFINE_FIELD(m_flForcedFadeScale, FIELD_FLOAT),
+DEFINE_FIELD(m_nMinCPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinCPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinGPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinGPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_DiffuseModulation, FIELD_COLOR32),
+DEFINE_FIELD(m_bDisableX360, FIELD_BOOLEAN),
+END_BYTESWAP_DATADESC()
+
+BEGIN_BYTESWAP_DATADESC(StaticPropLumpV10_t)
+DEFINE_FIELD(m_Origin, FIELD_VECTOR),
+DEFINE_FIELD(m_Angles, FIELD_VECTOR),	// QAngle
+DEFINE_FIELD(m_PropType, FIELD_SHORT),
+DEFINE_FIELD(m_FirstLeaf, FIELD_SHORT),
+DEFINE_FIELD(m_LeafCount, FIELD_SHORT),
+DEFINE_FIELD(m_Solid, FIELD_CHARACTER),
+DEFINE_FIELD(m_Flags, FIELD_CHARACTER),
+DEFINE_FIELD(m_Skin, FIELD_INTEGER),
+DEFINE_FIELD(m_FadeMinDist, FIELD_FLOAT),
+DEFINE_FIELD(m_FadeMaxDist, FIELD_FLOAT),
+DEFINE_FIELD(m_LightingOrigin, FIELD_VECTOR),
+DEFINE_FIELD(m_flForcedFadeScale, FIELD_FLOAT),
+DEFINE_FIELD(m_nMinCPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinCPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinGPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinGPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_DiffuseModulation, FIELD_COLOR32),
+DEFINE_FIELD(m_bDisableX360, FIELD_BOOLEAN),
+END_BYTESWAP_DATADESC()
+
+BEGIN_BYTESWAP_DATADESC(StaticPropLumpV11_t)
+DEFINE_FIELD(m_Origin, FIELD_VECTOR),
+DEFINE_FIELD(m_Angles, FIELD_VECTOR),	// QAngle
+DEFINE_FIELD(m_PropType, FIELD_SHORT),
+DEFINE_FIELD(m_FirstLeaf, FIELD_SHORT),
+DEFINE_FIELD(m_LeafCount, FIELD_SHORT),
+DEFINE_FIELD(m_Solid, FIELD_CHARACTER),
+DEFINE_FIELD(m_Flags, FIELD_CHARACTER),
+DEFINE_FIELD(m_Skin, FIELD_INTEGER),
+DEFINE_FIELD(m_FadeMinDist, FIELD_FLOAT),
+DEFINE_FIELD(m_FadeMaxDist, FIELD_FLOAT),
+DEFINE_FIELD(m_LightingOrigin, FIELD_VECTOR),
+DEFINE_FIELD(m_flForcedFadeScale, FIELD_FLOAT),
+DEFINE_FIELD(m_nMinCPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinCPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinGPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_nMinGPULevel, FIELD_CHARACTER),
+DEFINE_FIELD(m_DiffuseModulation, FIELD_COLOR32),
+DEFINE_FIELD(m_bDisableX360, FIELD_BOOLEAN),
+DEFINE_FIELD(m_Scale, FIELD_FLOAT),
+END_BYTESWAP_DATADESC()
+
 
 BEGIN_BYTESWAP_DATADESC( StaticPropLeafLump_t )
 	DEFINE_FIELD( m_Leaf, FIELD_SHORT ),
@@ -596,6 +748,7 @@ int			numplanes;
 dplane_t	dplanes[MAX_MAP_PLANES];
 
 int			numvertexes;
+
 dvertex_t	dvertexes[MAX_MAP_VERTS];
 
 int				g_numvertnormalindices;	// dfaces reference these. These index g_vertnormals.
@@ -621,6 +774,7 @@ CUtlVector<CDispVert> g_DispVerts;
 CUtlVector<CDispTri> g_DispTris;
 CUtlVector<unsigned char> g_DispLightmapSamplePositions; // LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS
 
+//enderzip: increased
 int         numorigfaces;
 dface_t     dorigfaces[MAX_MAP_FACES];
 
@@ -715,11 +869,12 @@ template< class T > static void AddLump( int lumpnum, CUtlVector<T> &data, int v
 dheader_t		*g_pBSPHeader;
 FileHandle_t	g_hBSPFile;
 
-struct Lump_t
+struct Lumps_t
 {
-	void	*pLumps[HEADER_LUMPS];
+	void* pLumps[HEADER_LUMPS];
 	int		size[HEADER_LUMPS];
 	bool	bLumpParsed[HEADER_LUMPS];
+	bool	bLumpFixed[HEADER_LUMPS];
 } g_Lumps;
 
 CGameLump	g_GameLumps;
@@ -1052,131 +1207,207 @@ void CGameLump::ComputeGameLumpSizeAndCount( int& size, int& clumpCount )
 	size += sizeof( dgamelumpheader_t ) + clumpCount * sizeof( dgamelump_t );
 }
 
+static dheader_t		s_MapHeader;
 
-void CGameLump::SwapGameLump( GameLumpId_t id, int version, byte *dest, byte *src, int length )
+void CGameLump::SwapGameLump(GameLumpId_t id, int version, byte* dest, byte* src, int length)
 {
 	int count = 0;
-	switch( id )
+	switch (id)
 	{
 	case GAMELUMP_STATIC_PROPS:
 		// Swap the static prop model dict
 		count = *(int*)src;
-		g_Swap.SwapBufferToTargetEndian( (int*)dest, (int*)src );
+		g_Swap.SwapBufferToTargetEndian((int*)dest, (int*)src);
 		count = g_bSwapOnLoad ? *(int*)dest : count;
 		src += sizeof(int);
 		dest += sizeof(int);
 
-		g_Swap.SwapFieldsToTargetEndian( (StaticPropDictLump_t*)dest, (StaticPropDictLump_t*)src, count );
+		g_Swap.SwapFieldsToTargetEndian((StaticPropDictLump_t*)dest, (StaticPropDictLump_t*)src, count);
 		src += sizeof(StaticPropDictLump_t) * count;
 		dest += sizeof(StaticPropDictLump_t) * count;
 
 		// Swap the leaf list
 		count = *(int*)src;
-		g_Swap.SwapBufferToTargetEndian( (int*)dest, (int*)src );
+		g_Swap.SwapBufferToTargetEndian((int*)dest, (int*)src);
 		count = g_bSwapOnLoad ? *(int*)dest : count;
 		src += sizeof(int);
 		dest += sizeof(int);
 
-		g_Swap.SwapFieldsToTargetEndian( (StaticPropLeafLump_t*)dest, (StaticPropLeafLump_t*)src, count );
+		g_Swap.SwapFieldsToTargetEndian((StaticPropLeafLump_t*)dest, (StaticPropLeafLump_t*)src, count);
 		src += sizeof(StaticPropLeafLump_t) * count;
 		dest += sizeof(StaticPropLeafLump_t) * count;
 
 		// Swap the models
 		count = *(int*)src;
-		g_Swap.SwapBufferToTargetEndian( (int*)dest, (int*)src );
+		g_Swap.SwapBufferToTargetEndian((int*)dest, (int*)src);
 		count = g_bSwapOnLoad ? *(int*)dest : count;
 		src += sizeof(int);
 		dest += sizeof(int);
 
 		// The one-at-a-time swap is to compensate for these structures 
 		// possibly being misaligned, which crashes the Xbox 360.
-		if ( version == 4 )
+		if (version == 4)
 		{
 			StaticPropLumpV4_t lump;
-			for ( int i = 0; i < count; ++i )
+			for (int i = 0; i < count; ++i)
 			{
-				Q_memcpy( &lump, src, sizeof(StaticPropLumpV4_t) );
-				g_Swap.SwapFieldsToTargetEndian( &lump, &lump );
-				Q_memcpy( dest, &lump, sizeof(StaticPropLumpV4_t) );
-				src += sizeof( StaticPropLumpV4_t );
-				dest += sizeof( StaticPropLumpV4_t );
+				Q_memcpy(&lump, src, sizeof(StaticPropLumpV4_t));
+				g_Swap.SwapFieldsToTargetEndian(&lump, &lump);
+				Q_memcpy(dest, &lump, sizeof(StaticPropLumpV4_t));
+				src += sizeof(StaticPropLumpV4_t);
+				dest += sizeof(StaticPropLumpV4_t);
 			}
 		}
-		else if ( version == 5 )
+		else if (version == 5)
 		{
 			StaticPropLumpV5_t lump;
-			for ( int i = 0; i < count; ++i )
+			for (int i = 0; i < count; ++i)
 			{
-				Q_memcpy( &lump, src, sizeof(StaticPropLumpV5_t) );
-				g_Swap.SwapFieldsToTargetEndian( &lump, &lump );
-				Q_memcpy( dest, &lump, sizeof(StaticPropLumpV5_t) );
-				src += sizeof( StaticPropLumpV5_t );
-				dest += sizeof( StaticPropLumpV5_t );
+				Q_memcpy(&lump, src, sizeof(StaticPropLumpV5_t));
+				g_Swap.SwapFieldsToTargetEndian(&lump, &lump);
+				Q_memcpy(dest, &lump, sizeof(StaticPropLumpV5_t));
+				src += sizeof(StaticPropLumpV5_t);
+				dest += sizeof(StaticPropLumpV5_t);
+			}
+		}
+		else if (version == 6)
+		{
+			StaticPropLumpV6_t lump;
+			for (int i = 0; i < count; ++i)
+			{
+				Q_memcpy(&lump, src, sizeof(StaticPropLumpV6_t));
+				g_Swap.SwapFieldsToTargetEndian(&lump, &lump);
+				Q_memcpy(dest, &lump, sizeof(StaticPropLumpV6_t));
+				src += sizeof(StaticPropLumpV6_t);
+				dest += sizeof(StaticPropLumpV6_t);
+			}
+		}
+		else if (version == 7)
+		{
+			StaticPropLumpV7_t lump;
+			for (int i = 0; i < count; ++i)
+			{
+				Q_memcpy(&lump, src, sizeof(StaticPropLumpV7_t));
+				g_Swap.SwapFieldsToTargetEndian(&lump, &lump);
+				Q_memcpy(dest, &lump, sizeof(StaticPropLumpV7_t));
+				src += sizeof(StaticPropLumpV7_t);
+				dest += sizeof(StaticPropLumpV7_t);
+			}
+		}
+		else if (version == 8)
+		{
+			StaticPropLumpV8_t lump;
+			for (int i = 0; i < count; ++i)
+			{
+				Q_memcpy(&lump, src, sizeof(StaticPropLumpV8_t));
+				g_Swap.SwapFieldsToTargetEndian(&lump, &lump);
+				Q_memcpy(dest, &lump, sizeof(StaticPropLumpV8_t));
+				src += sizeof(StaticPropLumpV8_t);
+				dest += sizeof(StaticPropLumpV8_t);
+			}
+		}
+		else if (version == 9)
+		{
+			StaticPropLumpV9_t lump;
+			for (int i = 0; i < count; ++i)
+			{
+				Q_memcpy(&lump, src, sizeof(StaticPropLumpV9_t));
+				g_Swap.SwapFieldsToTargetEndian(&lump, &lump);
+				Q_memcpy(dest, &lump, sizeof(StaticPropLumpV9_t));
+				src += sizeof(StaticPropLumpV9_t);
+				dest += sizeof(StaticPropLumpV9_t);
+			}
+		}
+		else if (version == 10)
+		{		
+			{
+				StaticPropLumpV10_t lump;
+				for (int i = 0; i < count; ++i)
+				{
+					Q_memcpy(&lump, src, sizeof(StaticPropLumpV10_t));
+					g_Swap.SwapFieldsToTargetEndian(&lump, &lump);
+					Q_memcpy(dest, &lump, sizeof(StaticPropLumpV10_t));
+					src += sizeof(StaticPropLumpV10_t);
+					dest += sizeof(StaticPropLumpV10_t);
+				}
+			}
+		}	
+		else if (version == 11)
+		{
+			StaticPropLumpV11_t lump;
+			for (int i = 0; i < count; ++i)
+			{
+				Q_memcpy(&lump, src, sizeof(StaticPropLumpV11_t));
+				g_Swap.SwapFieldsToTargetEndian(&lump, &lump);
+				Q_memcpy(dest, &lump, sizeof(StaticPropLumpV11_t));
+				src += sizeof(StaticPropLumpV11_t);
+				dest += sizeof(StaticPropLumpV11_t);
 			}
 		}
 		else
 		{
-			if ( version != 6 )
+			if (version != 11)
 			{
-				Error( "Unknown Static Prop Lump version %d didn't get swapped!\n", version );
+				Error("Unknown Static Prop Lump version %d didn't get swapped!\n", version);
 			}
 
-			StaticPropLump_t lump;
-			for ( int i = 0; i < count; ++i )
+			StaticPropLumpV11_t lump;
+			for (int i = 0; i < count; ++i)
 			{
-				Q_memcpy( &lump, src, sizeof(StaticPropLump_t) );
-				g_Swap.SwapFieldsToTargetEndian( &lump, &lump );
-				Q_memcpy( dest, &lump, sizeof(StaticPropLump_t) );
-				src += sizeof( StaticPropLump_t );
-				dest += sizeof( StaticPropLump_t );
+				Q_memcpy(&lump, src, sizeof(StaticPropLumpV11_t));
+				g_Swap.SwapFieldsToTargetEndian(&lump, &lump);
+				Q_memcpy(dest, &lump, sizeof(StaticPropLumpV11_t));
+				src += sizeof(StaticPropLumpV11_t);
+				dest += sizeof(StaticPropLumpV11_t);
 			}
+			//enderzip ^
 		}
 		break;
 
 	case GAMELUMP_DETAIL_PROPS:
 		// Swap the detail prop model dict
 		count = *(int*)src;
-		g_Swap.SwapBufferToTargetEndian( (int*)dest, (int*)src );
+		g_Swap.SwapBufferToTargetEndian((int*)dest, (int*)src);
 		count = g_bSwapOnLoad ? *(int*)dest : count;
 		src += sizeof(int);
 		dest += sizeof(int);
 
-		g_Swap.SwapFieldsToTargetEndian( (DetailObjectDictLump_t*)dest, (DetailObjectDictLump_t*)src, count );
+		g_Swap.SwapFieldsToTargetEndian((DetailObjectDictLump_t*)dest, (DetailObjectDictLump_t*)src, count);
 		src += sizeof(DetailObjectDictLump_t) * count;
 		dest += sizeof(DetailObjectDictLump_t) * count;
 
-		if ( version == 4 )
+		if (version == 4)
 		{
 			// Swap the detail sprite dict
 			count = *(int*)src;
-			g_Swap.SwapBufferToTargetEndian( (int*)dest, (int*)src );
+			g_Swap.SwapBufferToTargetEndian((int*)dest, (int*)src);
 			count = g_bSwapOnLoad ? *(int*)dest : count;
 			src += sizeof(int);
 			dest += sizeof(int);
 
 			DetailSpriteDictLump_t spritelump;
-			for ( int i = 0; i < count; ++i )
+			for (int i = 0; i < count; ++i)
 			{
-				Q_memcpy( &spritelump, src, sizeof(DetailSpriteDictLump_t) );
-				g_Swap.SwapFieldsToTargetEndian( &spritelump, &spritelump );
-				Q_memcpy( dest, &spritelump, sizeof(DetailSpriteDictLump_t) );
+				Q_memcpy(&spritelump, src, sizeof(DetailSpriteDictLump_t));
+				g_Swap.SwapFieldsToTargetEndian(&spritelump, &spritelump);
+				Q_memcpy(dest, &spritelump, sizeof(DetailSpriteDictLump_t));
 				src += sizeof(DetailSpriteDictLump_t);
 				dest += sizeof(DetailSpriteDictLump_t);
 			}
 
 			// Swap the models
 			count = *(int*)src;
-			g_Swap.SwapBufferToTargetEndian( (int*)dest, (int*)src );
+			g_Swap.SwapBufferToTargetEndian((int*)dest, (int*)src);
 			count = g_bSwapOnLoad ? *(int*)dest : count;
 			src += sizeof(int);
 			dest += sizeof(int);
 
 			DetailObjectLump_t objectlump;
-			for ( int i = 0; i < count; ++i )
+			for (int i = 0; i < count; ++i)
 			{
-				Q_memcpy( &objectlump, src, sizeof(DetailObjectLump_t) );
-				g_Swap.SwapFieldsToTargetEndian( &objectlump, &objectlump );
-				Q_memcpy( dest, &objectlump, sizeof(DetailObjectLump_t) );
+				Q_memcpy(&objectlump, src, sizeof(DetailObjectLump_t));
+				g_Swap.SwapFieldsToTargetEndian(&objectlump, &objectlump);
+				Q_memcpy(dest, &objectlump, sizeof(DetailObjectLump_t));
 				src += sizeof(DetailObjectLump_t);
 				dest += sizeof(DetailObjectLump_t);
 			}
@@ -1186,12 +1417,12 @@ void CGameLump::SwapGameLump( GameLumpId_t id, int version, byte *dest, byte *sr
 	case GAMELUMP_DETAIL_PROP_LIGHTING:
 		// Swap the LDR light styles
 		count = *(int*)src;
-		g_Swap.SwapBufferToTargetEndian( (int*)dest, (int*)src );
+		g_Swap.SwapBufferToTargetEndian((int*)dest, (int*)src);
 		count = g_bSwapOnLoad ? *(int*)dest : count;
 		src += sizeof(int);
 		dest += sizeof(int);
 
-		g_Swap.SwapFieldsToTargetEndian( (DetailPropLightstylesLump_t*)dest, (DetailPropLightstylesLump_t*)src, count );
+		g_Swap.SwapFieldsToTargetEndian((DetailPropLightstylesLump_t*)dest, (DetailPropLightstylesLump_t*)src, count);
 		src += sizeof(DetailObjectDictLump_t) * count;
 		dest += sizeof(DetailObjectDictLump_t) * count;
 		break;
@@ -1199,21 +1430,21 @@ void CGameLump::SwapGameLump( GameLumpId_t id, int version, byte *dest, byte *sr
 	case GAMELUMP_DETAIL_PROP_LIGHTING_HDR:
 		// Swap the HDR light styles
 		count = *(int*)src;
-		g_Swap.SwapBufferToTargetEndian( (int*)dest, (int*)src );
+		g_Swap.SwapBufferToTargetEndian((int*)dest, (int*)src);
 		count = g_bSwapOnLoad ? *(int*)dest : count;
 		src += sizeof(int);
 		dest += sizeof(int);
 
-		g_Swap.SwapFieldsToTargetEndian( (DetailPropLightstylesLump_t*)dest, (DetailPropLightstylesLump_t*)src, count );
+		g_Swap.SwapFieldsToTargetEndian((DetailPropLightstylesLump_t*)dest, (DetailPropLightstylesLump_t*)src, count);
 		src += sizeof(DetailObjectDictLump_t) * count;
 		dest += sizeof(DetailObjectDictLump_t) * count;
 		break;
 
 	default:
-		char idchars[5] = {0};
-		Q_memcpy( idchars, &id, 4 );
-		Warning( "Unknown game lump '%s' didn't get swapped!\n", idchars );
-		memcpy ( dest, src, length);
+		char idchars[5] = { 0 };
+		Q_memcpy(idchars, &id, 4);
+		Warning("Unknown game lump '%s' didn't get swapped!\n", idchars);
+		memcpy(dest, src, length);
 		break;
 	}
 }
@@ -1684,7 +1915,7 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 			if ( g_bSwapOnWrite )
 			{
 				// Load the collide data
-				physcollision->VCollideLoad( &collide, pPhysModel->solidCount, (const char *)pSrc, dataSize, false );
+				physcollision->VCollideLoad( &collide, pPhysModel->solidCount, (const char*)pSrc, dataSize, false );
 			}
 
 			int *offsets = new int[ pPhysModel->solidCount ];
@@ -1745,7 +1976,7 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 			pDest = pDestBase;
 			if ( g_bSwapOnLoad )
 			{
-				physcollision->VCollideLoad( &collide, pPhysModel->solidCount, (const char *)pSrc, dataSize, true );
+				physcollision->VCollideLoad( &collide, pPhysModel->solidCount, (const char*)pSrc, dataSize, true );
 			}
 
 			// Write out the ledge tree data
@@ -2214,6 +2445,62 @@ void CloseBSPFile( void )
 	g_pBSPHeader = NULL;
 }
 
+
+int LoadWorldLights(int lumpnum, dworldlight_t* pWorldlights)
+{
+	Assert(lumpnum == LUMP_WORLDLIGHTS || lumpnum == LUMP_WORLDLIGHTS_HDR);
+	if (lumpnum != LUMP_WORLDLIGHTS && lumpnum != LUMP_WORLDLIGHTS_HDR)
+	{
+		Error("Unexpected worldlight lumpnum %d\n", lumpnum);
+	}
+	if (!HasLump(lumpnum))
+	{
+		return 0;
+	}
+
+	int count = 0;
+	int version = LumpVersion(lumpnum);
+	if (version == 0)
+	{
+		// old version
+		dworldlight_old_t* pOldWorldlights = (dworldlight_old_t*)malloc(g_pBSPHeader->lumps[lumpnum].filelen);
+		count = CopyLump(lumpnum, pOldWorldlights);
+
+		for (int i = 0; i < count; i++)
+		{
+			pWorldlights[i].origin = pOldWorldlights[i].origin;
+			pWorldlights[i].intensity = pOldWorldlights[i].intensity;
+			pWorldlights[i].normal = pOldWorldlights[i].normal;
+			pWorldlights[i].shadow_cast_offset.Init(0.0f, 0.0f, 0.0f);
+			pWorldlights[i].cluster = pOldWorldlights[i].cluster;
+			pWorldlights[i].type = pOldWorldlights[i].type;
+			pWorldlights[i].style = pOldWorldlights[i].style;
+			pWorldlights[i].stopdot = pOldWorldlights[i].stopdot;
+			pWorldlights[i].stopdot2 = pOldWorldlights[i].stopdot2;
+			pWorldlights[i].exponent = pOldWorldlights[i].exponent;
+			pWorldlights[i].radius = pOldWorldlights[i].radius;
+			pWorldlights[i].constant_attn = pOldWorldlights[i].constant_attn;
+			pWorldlights[i].linear_attn = pOldWorldlights[i].linear_attn;
+			pWorldlights[i].quadratic_attn = pOldWorldlights[i].quadratic_attn;
+			pWorldlights[i].flags = pOldWorldlights[i].flags;
+			pWorldlights[i].texinfo = pOldWorldlights[i].texinfo;
+			pWorldlights[i].owner = pOldWorldlights[i].owner;
+		}
+
+		free(pOldWorldlights);
+	}
+	else if (version == 1)
+	{
+		count = CopyLump(lumpnum, pWorldlights);
+	}
+	else
+	{
+		Error("Unexpected worldlights lump version %d\n", version);
+	}
+
+	return count;
+}
+
 //-----------------------------------------------------------------------------
 //	LoadBSPFile
 //-----------------------------------------------------------------------------
@@ -2264,9 +2551,12 @@ void LoadBSPFile( const char *filename )
 	LoadLeafAmbientLighting( numleafs );
 
 	CopyLump( FIELD_CHARACTER, LUMP_ENTITIES, dentdata );
-	numworldlightsLDR = CopyLump( LUMP_WORLDLIGHTS, dworldlightsLDR );
-	numworldlightsHDR = CopyLump( LUMP_WORLDLIGHTS_HDR, dworldlightsHDR );
-	
+	//numworldlightsLDR = CopyLump( LUMP_WORLDLIGHTS, dworldlightsLDR );
+	//numworldlightsHDR = CopyLump( LUMP_WORLDLIGHTS_HDR, dworldlightsHDR );
+
+	numworldlightsLDR = LoadWorldLights(LUMP_WORLDLIGHTS, dworldlightsLDR);
+	numworldlightsHDR = LoadWorldLights(LUMP_WORLDLIGHTS_HDR, dworldlightsHDR);
+
 	numleafwaterdata = CopyLump( LUMP_LEAFWATERDATA, dleafwaterdata );
 	g_PhysCollideSize = CopyVariableLump<byte>( FIELD_CHARACTER, LUMP_PHYSCOLLIDE, (void**)&g_pPhysCollide );
 	g_PhysDispSize = CopyVariableLump<byte>( FIELD_CHARACTER, LUMP_PHYSDISP, (void**)&g_pPhysDisp );
@@ -2560,7 +2850,7 @@ static void AddLumpInternal( int lumpnum, void *data, int len, int version )
 	SafeWrite( g_hBSPFile, data, len );
 
 	// pad out to the next dword
-	AlignFilePosition( g_hBSPFile, 4 );
+	AlignFilePosition(g_hBSPFile, LUMP_ALIGNMENT);
 }
 
 template< class T >
@@ -2641,7 +2931,9 @@ void WriteBSPFile( const char *filename, char *pUnused )
 	memset( g_pBSPHeader, 0, sizeof( dheader_t ) );
 
 	g_pBSPHeader->ident = IDBSPHEADER;
-	g_pBSPHeader->version = BSPVERSION;
+
+	g_pBSPHeader->version = BSPVERSION - 1; //21 
+
 	g_pBSPHeader->mapRevision = g_MapRevision;
 
 	g_hBSPFile = SafeOpenWrite( filename );
@@ -2730,6 +3022,8 @@ void WriteBSPFile( const char *filename, char *pUnused )
 	AddLump( LUMP_VERTNORMALINDICES, g_vertnormalindices, g_numvertnormalindices );
 
 	AddLump( LUMP_LEAFMINDISTTOWATER, g_LeafMinDistToWater, numleafs );
+	AddLump(LUMP_WORLDLIGHTS, dworldlightsLDR, numworldlightsLDR, 1);
+	AddLump(LUMP_WORLDLIGHTS_HDR, dworldlightsHDR, numworldlightsHDR, 1);
 
 	AddGameLumps();
 
@@ -4085,50 +4379,58 @@ void SetAlignedLumpPosition( int lumpnum, int alignment = LUMP_ALIGNMENT )
 }
 
 template< class T >
-int SwapLumpToDisk( int fieldType, int lumpnum )
+int SwapLumpToDisk(int fieldType, int lumpnum)
 {
-	if ( g_pBSPHeader->lumps[lumpnum].filelen == 0 )
+	if (g_pBSPHeader->lumps[lumpnum].filelen == 0)
 		return 0;
 
-	DevMsg( "Swapping %s\n", GetLumpName( lumpnum ) );
+	DevMsg("Swapping %s\n", GetLumpName(lumpnum));
+
+	int nLumpSize = g_pBSPHeader->lumps[lumpnum].filelen;
+	if (g_Lumps.bLumpFixed[lumpnum])
+	{
+		nLumpSize = g_Lumps.size[lumpnum];
+	}
 
 	// lump swap may expand, allocate enough expansion room
-	void *pBuffer = malloc( 2*g_pBSPHeader->lumps[lumpnum].filelen );
+	int maxExpand = 2 * nLumpSize;
+	void* pBuffer = malloc(maxExpand);
 
 	// CopyLumpInternal will handle the swap on load case
-	unsigned int fieldSize = ( fieldType == FIELD_VECTOR ) ? sizeof(Vector) : sizeof(T);
-	unsigned int count = CopyLumpInternal<T>( fieldType, lumpnum, (T*)pBuffer, g_pBSPHeader->lumps[lumpnum].version );
+	unsigned int fieldSize = (fieldType == FIELD_VECTOR) ? sizeof(Vector) : sizeof(T);
+	unsigned int count = CopyLumpInternal<T>(fieldType, lumpnum, (T*)pBuffer, g_pBSPHeader->lumps[lumpnum].version);
 	g_pBSPHeader->lumps[lumpnum].filelen = count * fieldSize;
 
-	if ( g_bSwapOnWrite )
+	int nAlignment = LUMP_ALIGNMENT;
+	if (g_bSwapOnWrite)
 	{
 		// Swap the lump in place before writing
-		switch( lumpnum )
+		switch (lumpnum)
 		{
 		case LUMP_VISIBILITY:
-			SwapVisibilityLump( (byte*)pBuffer, (byte*)pBuffer, count );
+			SwapVisibilityLump((byte*)pBuffer, (byte*)pBuffer, count);
 			break;
-		
+
 		case LUMP_PHYSCOLLIDE:
 			// SwapPhyscollideLump may change size
-			SwapPhyscollideLump( (byte*)pBuffer, (byte*)pBuffer, count );
+			SwapPhyscollideLump((byte*)pBuffer, (byte*)pBuffer, count);
 			g_pBSPHeader->lumps[lumpnum].filelen = count;
 			break;
 
 		case LUMP_PHYSDISP:
-			SwapPhysdispLump( (byte*)pBuffer, (byte*)pBuffer, count );
+			SwapPhysdispLump((byte*)pBuffer, (byte*)pBuffer, count);
 			break;
 
 		default:
-			g_Swap.SwapBufferToTargetEndian( (T*)pBuffer, (T*)pBuffer, g_pBSPHeader->lumps[lumpnum].filelen / sizeof(T) );
+			g_Swap.SwapBufferToTargetEndian((T*)pBuffer, (T*)pBuffer, g_pBSPHeader->lumps[lumpnum].filelen / sizeof(T));
 			break;
 		}
 	}
 
-	SetAlignedLumpPosition( lumpnum );
-	SafeWrite( g_hBSPFile, pBuffer, g_pBSPHeader->lumps[lumpnum].filelen );
+	SetAlignedLumpPosition(lumpnum, nAlignment);
+	SafeWrite(g_hBSPFile, pBuffer, g_pBSPHeader->lumps[lumpnum].filelen);
 
-	free( pBuffer );
+	free(pBuffer);
 
 	return g_pBSPHeader->lumps[lumpnum].filelen;
 }
@@ -4136,27 +4438,35 @@ int SwapLumpToDisk( int fieldType, int lumpnum )
 template< class T >
 int SwapLumpToDisk( int lumpnum )
 {
-	if ( g_pBSPHeader->lumps[lumpnum].filelen == 0 || g_Lumps.bLumpParsed[lumpnum] )
+	if (g_pBSPHeader->lumps[lumpnum].filelen == 0 || g_Lumps.bLumpParsed[lumpnum])
 		return 0;
 
-	DevMsg( "Swapping %s\n", GetLumpName( lumpnum ) );
+	DevMsg("Swapping %s\n", GetLumpName(lumpnum));
 
-	// lump swap may expand, allocate enough room
-	void *pBuffer = malloc( 2*g_pBSPHeader->lumps[lumpnum].filelen );
-
-	// CopyLumpInternal will handle the swap on load case
-	int count = CopyLumpInternal<T>( lumpnum, (T*)pBuffer, g_pBSPHeader->lumps[lumpnum].version );
-	g_pBSPHeader->lumps[lumpnum].filelen = count * sizeof(T);
-
-	if ( g_bSwapOnWrite )
+	int nLumpSize = g_pBSPHeader->lumps[lumpnum].filelen;
+	if (g_Lumps.bLumpFixed[lumpnum])
 	{
-		// Swap the lump in place before writing
-		g_Swap.SwapFieldsToTargetEndian( (T*)pBuffer, (T*)pBuffer, count );
+		// use the fixed version as input to swap
+		nLumpSize = g_Lumps.size[lumpnum];
 	}
 
-	SetAlignedLumpPosition( lumpnum );
-	SafeWrite( g_hBSPFile, pBuffer, g_pBSPHeader->lumps[lumpnum].filelen );
-	free( pBuffer );
+	// lump swap may expand, allocate enough room
+	Assert(nLumpSize > 0);
+	void* pBuffer = malloc(2 * nLumpSize);
+
+	// CopyLumpInternal will handle the swap on load case
+	int count = CopyLumpInternal<T>(lumpnum, (T*)pBuffer, g_pBSPHeader->lumps[lumpnum].version);
+	g_pBSPHeader->lumps[lumpnum].filelen = count * sizeof(T);
+
+	if (g_bSwapOnWrite)
+	{
+		// Swap the lump in place before writing
+		g_Swap.SwapFieldsToTargetEndian((T*)pBuffer, (T*)pBuffer, count);
+	}
+
+	SetAlignedLumpPosition(lumpnum);
+	SafeWrite(g_hBSPFile, pBuffer, g_pBSPHeader->lumps[lumpnum].filelen);
+	free(pBuffer);
 
 	return g_pBSPHeader->lumps[lumpnum].filelen;
 }
@@ -4293,6 +4603,74 @@ void SwapLeafLumpToDisk( void )
 #endif
 }
 
+
+void SwapWorldLightsToDisk()
+{
+	bool bHasHDR = true;
+	if (g_pBSPHeader->lumps[LUMP_WORLDLIGHTS_HDR].filelen == 0 || g_Lumps.bLumpParsed[LUMP_WORLDLIGHTS_HDR])
+	{
+		bHasHDR = false;
+	}
+	int lumpnum = bHasHDR ? LUMP_WORLDLIGHTS_HDR : LUMP_WORLDLIGHTS;
+	DevMsg("Swapping %s\n", GetLumpName(lumpnum));
+	dworldlight_old_t* pOldWorldlights;
+	dworldlight_t* pWorldlights = NULL;
+	int count = 0;
+	// handle version difference
+	if (g_pBSPHeader->lumps[lumpnum].version == 0)
+	{
+		pOldWorldlights = (dworldlight_old_t*)malloc(g_pBSPHeader->lumps[lumpnum].filelen);
+		count = CopyLumpInternal(lumpnum, pOldWorldlights, g_pBSPHeader->lumps[lumpnum].version);
+		pWorldlights = (dworldlight_t*)malloc(count * sizeof(dworldlight_t));
+		// translate forward
+		for (int i = 0; i < count; i++)
+		{
+			pWorldlights[i].origin = pOldWorldlights[i].origin;
+			pWorldlights[i].intensity = pOldWorldlights[i].intensity;
+			pWorldlights[i].normal = pOldWorldlights[i].normal;
+			pWorldlights[i].shadow_cast_offset.Init(0.0f, 0.0f, 0.0f);
+			pWorldlights[i].cluster = pOldWorldlights[i].cluster;
+			pWorldlights[i].type = pOldWorldlights[i].type;
+			pWorldlights[i].style = pOldWorldlights[i].style;
+			pWorldlights[i].stopdot = pOldWorldlights[i].stopdot;
+			pWorldlights[i].stopdot2 = pOldWorldlights[i].stopdot2;
+			pWorldlights[i].exponent = pOldWorldlights[i].exponent;
+			pWorldlights[i].radius = pOldWorldlights[i].radius;
+			pWorldlights[i].constant_attn = pOldWorldlights[i].constant_attn;
+			pWorldlights[i].linear_attn = pOldWorldlights[i].linear_attn;
+			pWorldlights[i].quadratic_attn = pOldWorldlights[i].quadratic_attn;
+			pWorldlights[i].flags = pOldWorldlights[i].flags;
+			pWorldlights[i].texinfo = pOldWorldlights[i].texinfo;
+			pWorldlights[i].owner = pOldWorldlights[i].owner;
+		}
+		free(pOldWorldlights);
+		g_pBSPHeader->lumps[lumpnum].filelen = count * sizeof(dworldlight_t);
+		g_pBSPHeader->lumps[lumpnum].version = 1;
+	}
+	else if (g_pBSPHeader->lumps[lumpnum].version == 1)
+	{
+		pWorldlights = (dworldlight_t*)malloc(g_pBSPHeader->lumps[lumpnum].filelen);
+		count = CopyLumpInternal(lumpnum, pWorldlights, g_pBSPHeader->lumps[lumpnum].version);
+	}
+	else
+	{
+		Error("Unknown World Lights Lump version %d!\n", g_pBSPHeader->lumps[lumpnum].version);
+	}
+	if (g_bSwapOnWrite)
+	{
+		// Swap the lump in place before writing
+		g_Swap.SwapFieldsToTargetEndian((dworldlight_t*)pWorldlights, (dworldlight_t*)pWorldlights, count);
+	}
+	SetAlignedLumpPosition(lumpnum);
+	SafeWrite(g_hBSPFile, pWorldlights, g_pBSPHeader->lumps[lumpnum].filelen);
+	free(pWorldlights);
+	if (bHasHDR)
+	{
+		// has HDR, strip obsolete LDR in favor of HDR
+		g_pBSPHeader->lumps[LUMP_WORLDLIGHTS].filelen = 0;
+	}
+}
+
 void SwapOcclusionLumpToDisk( void )
 {
 	DevMsg( "Swapping %s\n", GetLumpName( LUMP_OCCLUSION ) );
@@ -4353,7 +4731,7 @@ void BuildStaticPropNameTable()
 			return;
 		}
 
-		if ( nVersion != 4 && nVersion != 5 && nVersion != 6 )
+		if (nVersion < 4 || nVersion > GAMELUMP_STATIC_PROPS_VERSION)
 		{
 			Error( "Unknown Static Prop Lump version %d!\n", nVersion );
 		}
@@ -4379,25 +4757,61 @@ void BuildStaticPropNameTable()
 			// get the instances
 			count = ((int *)pGameLumpData)[0];
 			pGameLumpData += sizeof( int );
-			for ( int i = 0; i < count; i++ )
+			for (int i = 0; i < count; i++)
 			{
 				int propType;
-				if ( nVersion == 4 )
+				if (nVersion == 4)
 				{
-					propType = ((StaticPropLumpV4_t *)pGameLumpData)->m_PropType;
-					pGameLumpData += sizeof( StaticPropLumpV4_t );
+					propType = ((StaticPropLumpV4_t*)pGameLumpData)->m_PropType;
+					pGameLumpData += sizeof(StaticPropLumpV4_t);
 				}
-				else if ( nVersion == 5 )
+				else if (nVersion == 5)
 				{
-					propType = ((StaticPropLumpV5_t *)pGameLumpData)->m_PropType;
-					pGameLumpData += sizeof( StaticPropLumpV5_t );
+					propType = ((StaticPropLumpV5_t*)pGameLumpData)->m_PropType;
+					pGameLumpData += sizeof(StaticPropLumpV5_t);
+				}
+				else if (nVersion == 6)
+				{
+					propType = ((StaticPropLumpV6_t*)pGameLumpData)->m_PropType;
+					pGameLumpData += sizeof(StaticPropLumpV6_t);
+				}
+				else if (nVersion == 7)
+				{
+					propType = ((StaticPropLumpV7_t*)pGameLumpData)->m_PropType;
+					pGameLumpData += sizeof(StaticPropLumpV7_t);
+				}
+				else if (nVersion == 8)
+				{
+					propType = ((StaticPropLumpV8_t*)pGameLumpData)->m_PropType;
+					pGameLumpData += sizeof(StaticPropLumpV8_t);
+				}
+				else if (nVersion == 9)
+				{
+					propType = ((StaticPropLumpV9_t*)pGameLumpData)->m_PropType;
+					pGameLumpData += sizeof(StaticPropLumpV9_t);
+				}
+				else if (nVersion == 10)
+				{				
+					propType = ((StaticPropLumpV10_t*)pGameLumpData)->m_PropType;
+					pGameLumpData += sizeof(StaticPropLumpV10_t);
+				}
+				else if (nVersion == 11)
+				{
+					propType = ((StaticPropLumpV11_t*)pGameLumpData)->m_PropType;
+					pGameLumpData += sizeof(StaticPropLumpV11_t);
 				}
 				else
 				{
-					propType = ((StaticPropLump_t *)pGameLumpData)->m_PropType;
-					pGameLumpData += sizeof( StaticPropLump_t );
+					if (nVersion != 11)
+					{
+						Error("BuildStaticPropNameTable: Unknown Static Prop Lump version %d!\n", nVersion);
+					}
+
+					propType = ((StaticPropLumpV11_t*)pGameLumpData)->m_PropType;
+					pGameLumpData += sizeof(StaticPropLumpV11_t);
+					//enderzip ^
 				}
-				g_StaticPropInstances.AddToTail( propType );
+				g_StaticPropInstances.AddToTail(propType);
 			}
 		}
 	}
