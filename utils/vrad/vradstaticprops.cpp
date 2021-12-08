@@ -232,7 +232,7 @@ static void ConvertTexelDataToTexture(unsigned int _resX, unsigned int _resY, Im
 
 // Such a monstrosity. :(
 static void GenerateLightmapSamplesForMesh( const matrix3x4_t& _matPos, const matrix3x4_t& _matNormal, int _iThread, int _skipProp, int _nFlags, int _lightmapResX, int _lightmapResY, 
-											studiohdr_t* _pStudioHdr, mstudiomodel_t* _pStudioModel, OptimizedModel::ModelHeader_t* _pVtxModel, int _meshID, 
+											studiohdr_t* _pStudioHdr, mstudiomodel_t* _pStudioModel, OptimizedModel::ModelHeader_t* _pVtxModel, int _meshID, float _flScale, 
 											CComputeStaticPropLightingResults *_pResults );
 
 // Debug function, converts lightmaps to linear space then dumps them out. 
@@ -319,6 +319,8 @@ private:
 		ImageFormat				m_LightmapImageFormat;
 		unsigned int			m_LightmapImageWidth;
 		unsigned int			m_LightmapImageHeight;
+
+		float					m_Scale;
 
 	};
 
@@ -1047,6 +1049,8 @@ void CVradStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 		m_StaticProps[i].m_LightmapImageFormat = IMAGE_FORMAT_RGB888;
 		m_StaticProps[i].m_LightmapImageWidth = lump.m_nLightmapResolutionX;
 		m_StaticProps[i].m_LightmapImageHeight = lump.m_nLightmapResolutionY;
+
+		m_StaticProps[i].m_Scale = lump.m_Scale;
 	}
 }
 
@@ -1370,7 +1374,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 				// TODO: Move this into its own function. In fact, refactor this whole function.
 				if (withTexelLighting)
 				{
-					GenerateLightmapSamplesForMesh( matPos, matNormal, iThread, skip_prop, nFlags, prop.m_LightmapImageWidth, prop.m_LightmapImageHeight, pStudioHdr, pStudioModel, pVtxModel, meshID, pResults );
+					GenerateLightmapSamplesForMesh( matPos, matNormal, iThread, skip_prop, nFlags, prop.m_LightmapImageWidth, prop.m_LightmapImageHeight, pStudioHdr, pStudioModel, pVtxModel, meshID, prop.m_Scale, pResults );
 				}
 
 				// If we do lightmapping, we also do vertex lighting as a potential fallback. This may change.
@@ -1379,7 +1383,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 					Vector sampleNormal;
 					Vector samplePosition;
 					// transform position and normal into world coordinate system
-					VectorTransform(*vertData->Position(vertexID), matPos, samplePosition);
+					VectorTransform(*vertData->Position(vertexID) * prop.m_Scale, matPos, samplePosition);
 					VectorTransform(*vertData->Normal(vertexID), matNormal, sampleNormal);
 
 					if ( PositionInSolid( samplePosition ) )
@@ -1843,6 +1847,7 @@ void CVradStaticPropMgr::AddPolysForRayTrace( void )
 					{
 						Vector verts[3];
 						queryModel->GetTriangleVerts( nConvex, nTri, verts );
+						*verts *= prop.m_Scale; // TODO: is it needed?
 						for ( int nVert = 0; nVert < 3; ++nVert )
 							verts[nVert] = xform.VMul4x3(verts[nVert]);
 						g_RtEnv.AddTriangle ( TRACE_ID_STATICPROP | nProp, verts[0], verts[1], verts[2], fullCoverage );
@@ -1945,6 +1950,7 @@ void CVradStaticPropMgr::AddPolysForRayTrace( void )
 									// transform position into world coordinate system
 									matrix3x4_t	matrix;
 									AngleMatrix( prop.m_Angles, prop.m_Origin, matrix );
+									MatrixScaleBy( prop.m_Scale, matrix );
 
 									Vector position1;
 									Vector position2;
@@ -2129,6 +2135,7 @@ void CVradStaticPropMgr::BuildTriList( CStaticProp &prop )
 								// transform position into world coordinate system
 								matrix3x4_t	matrix;
 								AngleMatrix( prop.m_Angles, prop.m_Origin, matrix );
+								MatrixScaleBy( prop.m_Scale, matrix );
 
 								Vector position1;
 								Vector position2;
@@ -2274,7 +2281,7 @@ inline float ComputeBarycentricDistanceToTri( Vector _barycentricCoord, Vector2D
 }
 
 // ------------------------------------------------------------------------------------------------
-static void GenerateLightmapSamplesForMesh( const matrix3x4_t& _matPos, const matrix3x4_t& _matNormal, int _iThread, int _skipProp, int _flags, int _lightmapResX, int _lightmapResY, studiohdr_t* _pStudioHdr, mstudiomodel_t* _pStudioModel, OptimizedModel::ModelHeader_t* _pVtxModel, int _meshID, CComputeStaticPropLightingResults *_outResults )
+static void GenerateLightmapSamplesForMesh( const matrix3x4_t& _matPos, const matrix3x4_t& _matNormal, int _iThread, int _skipProp, int _flags, int _lightmapResX, int _lightmapResY, studiohdr_t* _pStudioHdr, mstudiomodel_t* _pStudioModel, OptimizedModel::ModelHeader_t* _pVtxModel, int _meshID, float _flScale, CComputeStaticPropLightingResults *_outResults )
 {
 	// Could iterate and gen this if needed.
 	int nLod = 0;
@@ -2323,9 +2330,9 @@ static void GenerateLightmapSamplesForMesh( const matrix3x4_t& _matPos, const ma
 					int vertex3 = pStripGroup->pVertex(i3)->origMeshVertID;
 
 					Vector modelPos[3] = {
-						*vertData->Position(vertex1),
-						*vertData->Position(vertex2),
-						*vertData->Position(vertex3)
+						*vertData->Position(vertex1)* _flScale,
+						*vertData->Position(vertex2)* _flScale,
+						*vertData->Position(vertex3)* _flScale
 					};
 
 					Vector modelNormal[3] = {
