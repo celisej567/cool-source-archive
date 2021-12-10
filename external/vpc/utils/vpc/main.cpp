@@ -85,7 +85,8 @@ CVPC::CVPC()
 	}
 
 #ifdef WIN32
-	m_eVSVersion = k_EVSVersion_2015;
+	//m_eVSVersion = k_EVSVersion_2015;
+	m_eVSVersion = k_EVSVersion_2019; //defaulted to vs2019
 	m_bUseVS2010FileFormat = true;
 	m_bUseUnity = false;
 #else
