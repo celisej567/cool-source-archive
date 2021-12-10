@@ -1202,7 +1202,14 @@ void CStaticProp::InsertPropIntoKDTree()
 		vcollide_t *pCollide = CM_VCollideForModel( -1, m_pModel );
 		if ( pCollide && pCollide->solidCount )
 		{
-			physcollision->CollideGetAABB( &mins, &maxs, CM_ScalePhysCollide( pCollide, m_Scale ), m_Origin, m_Angles );
+			if (m_Scale == 1.0f)
+			{
+				physcollision->CollideGetAABB(&mins, &maxs, pCollide->solids[0], m_Origin, m_Angles);
+			}
+			else
+			{
+				physcollision->CollideGetAABB(&mins, &maxs, CM_ScalePhysCollide(pCollide, m_Scale), m_Origin, m_Angles);
+			}
 		}
 		else
 		{
@@ -1255,7 +1262,14 @@ void CStaticProp::CreateVPhysics( IPhysicsEnvironment *pPhysEnv, IVPhysicsKeyHan
 
 	if (pVCollide)
 	{
-		pPhysCollide = CM_ScalePhysCollide( pVCollide, m_Scale );
+		if (m_Scale == 1.0f)
+		{
+			pPhysCollide = pVCollide->solids[0];
+		}
+		else
+		{
+			pPhysCollide = CM_ScalePhysCollide(pVCollide, m_Scale);
+		}
 
 		IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pVCollide->pKeyValues );
 		while ( !pParse->Finished() )
@@ -1449,7 +1463,9 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 
 				break;
 			default:
-				Error("Unexpected version while deserializing lumps.");
+				//Error("Unexpected version while deserializing lumps.");
+			         UnserializeLump<StaticPropLump_t>(&lump, buf); break;
+
 		}
 
 		m_StaticProps[i].Init(i, lump, m_StaticPropDict[lump.m_PropType].m_pModel);
