@@ -36,72 +36,58 @@ public:
 		HKEY hKey;
 		int firstVer = 8;
 		const int lastVer = 17; // Handle up to VS 17, AKA VS 2022
-		if ( g_pVPC->Is2010() )
+		if (g_pVPC->Is2010())
 		{
 			firstVer = 10;
 		}
-		else if ( g_pVPC->BUse2008() )
+		for (int vsVer = firstVer; vsVer <= lastVer; ++vsVer)
 		{
-			firstVer = 9;
-		}
-		for ( int vsVer = firstVer; vsVer <= lastVer; ++vsVer )
-		{
-			
 			// Handle both VisualStudio and VCExpress (used by some SourceSDK customers)
-			RegStartPoint searchPoints[] =
+			const char* productName[] =
 			{
-				{ HKEY_LOCAL_MACHINE, "Software\\Microsoft\\VisualStudio\\%d.0\\Projects" }, // Visual Studio Professional
-				{ HKEY_LOCAL_MACHINE, "Software\\Microsoft\\VCExpress\\%d.0\\Projects" }, // VC Express 2010 and 2012
-				{ HKEY_CURRENT_USER, "Software\\Microsoft\\WDExpress\\%d.0_Config\\Projects" }, // WinDev Express -- VS Express starting with VS 2013
+				"VisualStudio",
+				"VCExpress",
 			};
-			for ( int j = 0; j < ARRAYSIZE(searchPoints); ++j )
+			for (int productNumber = 0; productNumber < ARRAYSIZE(productName); ++productNumber)
 			{
-				RegStartPoint& searchPoint = searchPoints[ j ];
 				char pRegKeyName[1000];
-				V_snprintf( pRegKeyName, ARRAYSIZE(pRegKeyName), searchPoint.baseDir, vsVer );
-				LONG ret = RegOpenKeyEx( searchPoint.baseKey, pRegKeyName, 0, KEY_READ, &hKey );
-				if ( ret != ERROR_SUCCESS )
-					g_pVPC->VPCError( "Unable to open registry key %s.", pRegKeyName );
+				V_snprintf(pRegKeyName, ARRAYSIZE(pRegKeyName), "Software\\Microsoft\\%s\\%d.0\\Projects", productName[productNumber], vsVer);
+				LONG ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, pRegKeyName, 0, KEY_READ, &hKey);
+				//if ( ret != ERROR_SUCCESS )
+				//	g_pVPC->VPCError( "Unable to open registry key %s.", pRegKeyName );
 
-				for ( int i=0; i < 200; i++ )
+				for (int i = 0; i < 200; i++)
 				{
-					char szKeyName[MAX_PATH];	
-					DWORD dwKeyNameSize = sizeof( szKeyName );
-					ret = RegEnumKeyEx( hKey, i, szKeyName, &dwKeyNameSize, NULL, NULL, NULL, NULL );
-					if ( ret == ERROR_NO_MORE_ITEMS )
+					char szKeyName[MAX_PATH];
+					DWORD dwKeyNameSize = sizeof(szKeyName);
+					ret = RegEnumKeyEx(hKey, i, szKeyName, &dwKeyNameSize, NULL, NULL, NULL, NULL);
+					if (ret == ERROR_NO_MORE_ITEMS)
 						break;
-			
-					HKEY hSubKey;	
-					LONG ret = RegOpenKeyEx( hKey, szKeyName, 0, KEY_READ, &hSubKey );
-					if ( ret == ERROR_SUCCESS )
+
+					HKEY hSubKey;
+					LONG ret = RegOpenKeyEx(hKey, szKeyName, 0, KEY_READ, &hSubKey);
+					if (ret == ERROR_SUCCESS)
 					{
 						DWORD dwType;
 						char ext[MAX_PATH];
-						DWORD dwExtLen = sizeof( ext );
-						ret = RegQueryValueEx( hSubKey, "DefaultProjectExtension", NULL, &dwType, (BYTE*)ext, &dwExtLen );
-						RegCloseKey( hSubKey );
+						DWORD dwExtLen = sizeof(ext);
+						ret = RegQueryValueEx(hSubKey, "DefaultProjectExtension", NULL, &dwType, (BYTE*)ext, &dwExtLen);
+						RegCloseKey(hSubKey);
 
 						// VS 2012 and beyond has the DefaultProjectExtension as vcxproj instead of vcproj
-						if ( ret == ERROR_SUCCESS && dwType == REG_SZ && ( V_stricmp( ext, "vcproj" ) == 0 || V_stricmp( ext, "vcxproj" ) == 0 ) )
+						if (ret == ERROR_SUCCESS && dwType == REG_SZ && (V_stricmp(ext, "vcproj") == 0 || V_stricmp(ext, "vcxproj") == 0))
 						{
-							V_strncpy( szSolutionGUID, szKeyName, ARRAYSIZE(szSolutionGUID) );
-							RegCloseKey( hKey );
+							V_strncpy(szSolutionGUID, szKeyName, ARRAYSIZE(szSolutionGUID));
+							RegCloseKey(hKey);
 							return;
 						}
 					}
 				}
 
-				RegCloseKey( hKey );
+				RegCloseKey(hKey);
 			}
-			
-			//{
-			//	char szKeyName[MAX_PATH];
-			//	DWORD dwKeyNameSize = sizeof(szKeyName);
-			//	V_strncpy(szSolutionGUID, szKeyName, ARRAYSIZE(szSolutionGUID));
-			//	return;
-			//}
 		}
-		g_pVPC->VPCError( "Unable to find RegKey for .vcproj or .vcxproj files in solutions." );
+		g_pVPC->VPCError("Unable to find RegKey for .vcproj or .vcxproj files in solutions.");
 	}
 
 	virtual void GenerateSolutionFile( const char *pSolutionFilename, CUtlVector<CDependency_Project*> &projects )
