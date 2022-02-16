@@ -8,6 +8,10 @@
 // Project definitions //
 /////////////////////////
 
+$Project "appframework"
+{
+	"appframework\appframework.vpc" 
+}
 $Project "captioncompiler"
 {
 	"utils\captioncompiler\captioncompiler.vpc" [$WIN32]
