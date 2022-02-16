@@ -906,12 +906,16 @@ bool CGame::CreateGameWindow( void )
 
 	if (!windowName[0])
 	{
-		Q_strncpy( windowName, "HALF-LIFE 2", sizeof(windowName) );
+		Q_strncpy( windowName, "CoolSource", sizeof(windowName) );
 	}
 
 	if ( IsOpenGL() )
 	{
 		V_strcat( windowName, " - OpenGL", sizeof( windowName ) );
+	}	
+	else ( IsVulkan() )
+	{
+		V_strcat( windowName, " - Vulkan", sizeof( windowName ) );
 	}
 
 #if PIX_ENABLE || defined( PIX_INSTRUMENTATION )

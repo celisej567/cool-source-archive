@@ -625,6 +625,14 @@ void CMaterialSystem::SetShaderAPI( char const *pShaderAPIDLL )
 	{
 		pShaderAPIDLL = "shaderapidx11.dll";
 	}
+	else if (CommandLine()->ParmValue("-dxlevel", 90) == 100 || strstr(Plat_GetCommandLineA(), "-dx10") != NULL)
+	{
+		pShaderAPIDLL = "shaderapidx10.dll";
+	}
+	else if (strstr(Plat_GetCommandLineA(), "-vulkan") != NULL)
+	{
+		pShaderAPIDLL = "shaderapidxvk.dll";
+	}	
 	else if ( !pShaderAPIDLL )
 	{
 		pShaderAPIDLL = "shaderapidx9.dll";

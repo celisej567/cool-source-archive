@@ -139,6 +139,10 @@ $Project "shaderapidx11"
 	"materialsystem\shaderapidx11\shaderapidx11.vpc"
 }
 
+$Project "shaderapidxvk"
+{
+	"materialsystem\shaderapidxvk\shaderapidxvk.vpc"
+}
 $Project "stdshader_dbg"
 {
 	"materialsystem\stdshaders\stdshader_dbg.vpc" [$WIN32||$X360||$POSIX]

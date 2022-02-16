@@ -30,6 +30,11 @@ FORCEINLINE bool IsOpenGL( void )
 	return IsPlatformOpenGL() || IsEmulatingGL();
 }
 
+FORCEINLINE bool IsVulkan( void )
+{
+	return (Plat_GetCommandLineA()) ? (strstr(Plat_GetCommandLineA(), "-vulkan") != NULL) : false;
+}
+
 //-----------------------------------------------------------------------------
 // Material system interface version
 //-----------------------------------------------------------------------------
