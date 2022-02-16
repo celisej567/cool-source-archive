@@ -8,19 +8,19 @@
 
 #include "host_state.h"
 
-//#define CON_COMMAND_SERVER_SUPPORT
+#define CON_COMMAND_SERVER_SUPPORT
 
 #include "tier2/tier2.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 
 #ifdef CON_COMMAND_SERVER_SUPPORT
 #include <algorithm>
-#include "socketlib/socketlib.h"
+#include "../public/socketlib/socketlib.h"
 #define MINIZ_NO_ARCHIVE_APIS
 #include "../../thirdparty/miniz/miniz.c"
-#include "../../thirdparty/miniz/simple_bitmap.h"
+#include <WinUser.h>
 #define STBI_NO_STDIO
-#include "../../thirdparty/stb_image/stb_image.c"
+//#include "../../thirdparty/stb_image/ml_stb_image.c"
 #include "ivideomode.h"
 #endif
 
@@ -101,9 +101,9 @@ public:
 
 	void close(void);
 
-	const simple_bgr_bitmap& frameBuffer(void) const { return m_frame_buffer; }
+	const int& frameBuffer(void) const { return m_frame_buffer; }
 
-	simple_bgr_bitmap& frameBuffer(void) { return m_frame_buffer; }
+	int& frameBuffer(void) { return m_frame_buffer; }
 
 private:
 	int m_width, m_height;
@@ -115,7 +115,7 @@ private:
 	char m_bitmap_info[16 + sizeof(BITMAPINFO)];
 	BITMAPINFO* m_pBitmap_hdr;
 	HDC m_windowHDC;
-	simple_bgr_bitmap m_frame_buffer;
+	int m_frame_buffer;
 	static frame_buf_window* m_pCur_app;
 
 	user_window_proc_ptr_t m_pWindow_proc;
@@ -179,7 +179,7 @@ void frame_buf_window::update(void)
       
 void frame_buf_window::close(void)
 { 
-    m_frame_buffer.clear();
+    //m_frame_buffer.clear();
       
     if (m_window)
     {
@@ -192,41 +192,7 @@ void frame_buf_window::close(void)
                    
 void frame_buf_window::create_window(const char* pTitle)
 {
-    memset( &m_window_class, 0, sizeof( m_window_class ) );
-    m_window_class.style = CS_OWNDC | CS_VREDRAW | CS_HREDRAW;
-    m_window_class.lpfnWndProc = static_window_proc;
-    m_window_class.cbWndExtra = sizeof(DWORD);
-    m_window_class.hCursor = LoadCursor(0, IDC_ARROW);
-    m_window_class.lpszClassName = pTitle;
-    m_window_class.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH); //GetStockObject(NULL_BRUSH);
-    RegisterClass(&m_window_class);
-            
-    RECT rect;
-    rect.left = rect.top = 0;
-    rect.right = m_width * m_scale_x;
-    rect.bottom = m_height * m_scale_y;
-    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, 0);
-    rect.right -= rect.left;
-    rect.bottom -= rect.top;
-
-    m_orig_x = (GetSystemMetrics(SM_CXSCREEN) - rect.right) / 2;
-    m_orig_y = (GetSystemMetrics(SM_CYSCREEN) - rect.bottom) / 2;
-
-    m_orig_width = rect.right;
-    m_orig_height = rect.bottom;
-
-    m_pCur_app = this;
-      
-    m_window = CreateWindowEx(
-        0, pTitle, pTitle, 
-        WS_OVERLAPPEDWINDOW, 
-        m_orig_x, m_orig_y, rect.right, rect.bottom, 0, 0, 0, 0);
-
-    SetWindowLong(m_window, 0, reinterpret_cast<LONG>(this));
-      
-    m_pCur_app = NULL;
-
-    ShowWindow(m_window, SW_NORMAL);            
+     
 }
 
 void frame_buf_window::create_bitmap(void)
@@ -247,8 +213,8 @@ void frame_buf_window::create_bitmap(void)
 
     m_windowHDC = GetDC(m_window);
       
-    m_frame_buffer.init( m_width, m_height );
-	m_frame_buffer.cls( 30, 30, 30 );
+   // m_frame_buffer.init( m_width, m_height );
+	//m_frame_buffer.cls( 30, 30, 30 );
 	//m_frame_buffer.draw_text( 50, 200, 2, 255, 127, 128, "This is a test!" );
 }         
 
@@ -266,19 +232,6 @@ LRESULT frame_buf_window::window_proc(HWND hWnd, UINT message, WPARAM wParam, LP
     {
         case WM_PAINT:
         {
-			if (m_frame_buffer.is_valid())
-			{
-				RECT window_size;
-				GetClientRect(hWnd, &window_size);
-
-				StretchDIBits(m_windowHDC, 
-					0, 0, window_size.right, window_size.bottom, 
-					0, 0, m_width, m_height, 
-					m_frame_buffer.get_ptr(), m_pBitmap_hdr, 
-					DIB_RGB_COLORS, SRCCOPY);
-
-				ValidateRect(hWnd, NULL);
-			}
 			break;
         }
         case WM_KEYDOWN:
@@ -522,7 +475,7 @@ public:
 
 		m_bHasNewScreenshot = false;
 		m_nScreenshotID = 0;
-		m_screenshot.clear();
+		//m_screenshot.clear();
 		
 		m_bReceivedNewCameraPos = false;
 		memset( &m_NewCameraPos, 0, sizeof( m_NewCameraPos ) );
@@ -623,7 +576,7 @@ public:
 	bool HasNewScreenshotFlag() const { return m_bHasNewScreenshot; }
 	void ClearNewScreenshotFlag() { m_bHasNewScreenshot = false; }
 	uint GetScreenshotID() const { return m_nScreenshotID; }
-	simple_bitmap &GetScreenshot() { return m_screenshot; }
+	int &GetScreenshot() { return m_screenshot; }
 
 	bool HasNewConVarDumpFlag() const { return m_bHasNewConVarDump; }
 	void ClearHasNewConVarDumpFlag() { m_bHasNewConVarDump = false; }
@@ -644,7 +597,7 @@ private:
 	bool m_bReceivedNewCameraPos;
 	SetCameraPosPacket_t m_NewCameraPos;
 
-	simple_bitmap m_screenshot;
+	int m_screenshot;
 	bool m_bHasNewScreenshot;
 	uint m_nScreenshotID;
 
@@ -716,7 +669,7 @@ private:
 					videomode->ReadScreenPixels( 0, 0, nWidth, nHeight, s_pBuf, IMAGE_FORMAT_RGB888 );
 
 					size_t nPNGSize = 0;
-					void *pPNGData = tdefl_write_image_to_png_file_in_memory( s_pBuf, nWidth, nHeight, 3, &nPNGSize, true );
+					void *pPNGData = tdefl_write_image_to_png_file_in_memory( s_pBuf, nWidth, nHeight, 3, &nPNGSize );
 
 					if ( pPNGData )
 					{
@@ -771,9 +724,9 @@ private:
 					else
 					{
 						int nWidth = 0, nHeight = 0, nComp = 3;
-						unsigned char *pImageData = stbi_load_from_memory( reinterpret_cast< stbi_uc const * >( pPNGData ), nPNGDataSize, &nWidth, &nHeight, &nComp, 3);
+						//unsigned char *pImageData = stbi_load_from_memory( reinterpret_cast< stbi_uc const * >( pPNGData ), nPNGDataSize, &nWidth, &nHeight, &nComp, 3);
 
-						if ( !pImageData )
+						//if ( !pImageData )
 						{
 							Warning( "CONCMDSRV: Failed unpacking PNG screenshot!\n" );
 							return false;
@@ -782,14 +735,14 @@ private:
 						m_bHasNewScreenshot = true;
 						m_nScreenshotID = replyPacket.m_nScreenshotID;
 
-						if ( ( (int)m_screenshot.width() != nWidth ) || ( (int)m_screenshot.height() != nHeight ) )
-						{
-							m_screenshot.init( nWidth, nHeight );
-						}
+						//if ( ( (int)m_screenshot.width() != nWidth ) || ( (int)m_screenshot.height() != nHeight ) )
+						//{
+						//	m_screenshot.init( nWidth, nHeight );
+						//}
 
-						memcpy( m_screenshot.get_ptr(), pImageData, nWidth * nHeight * 3 );
+						//memcpy( m_screenshot.get_ptr(), pImageData, nWidth * nHeight * 3 );
 													
-						stbi_image_free( pImageData );
+						//stbi_image_free( pImageData );
 					}
 
 					break;
@@ -1073,7 +1026,7 @@ public:
 						
 		bool bHasUpdatedScreenshot = false;
 				
-		simple_bgr_bitmap &frameBuf = m_pFrameBufWindow->frameBuffer();						
+		//simple_bgr_bitmap &frameBuf = m_pFrameBufWindow->frameBuffer();						
 
 		for ( int i = 0; i < cMaxClients; i++ )
 		{
@@ -1096,7 +1049,7 @@ public:
 				{
 					client.ClearNewScreenshotFlag();
 
-					simple_bitmap &clientScreenshot = client.GetScreenshot();
+					//simple_bitmap &clientScreenshot = client.GetScreenshot();
 
 					if ( ccs_remote_screenshots_delta.GetBool() )
 					{
@@ -1107,20 +1060,21 @@ public:
 							uint nScreenWidth = videomode->GetModeWidth();
 							uint nScreenHeight = videomode->GetModeHeight();
 
-							if ( ( m_screenshot.width() != nScreenWidth ) || ( m_screenshot.height() != nScreenHeight ) )
-							{
-								m_screenshot.init( nScreenWidth, nScreenHeight );
-							}
+							//if ( ( m_screenshot.width() != nScreenWidth ) || ( m_screenshot.height() != nScreenHeight ) )
+							//{
+							//	m_screenshot.init( nScreenWidth, nScreenHeight );
+							//}
 
-							videomode->ReadScreenPixels( 0, 0, nScreenWidth, nScreenHeight, m_screenshot.get_ptr(), IMAGE_FORMAT_RGB888 );
+							//videomode->ReadScreenPixels( 0, 0, nScreenWidth, nScreenHeight, m_screenshot.get_ptr(), IMAGE_FORMAT_RGB888 );
 						}
 
-						uint mx = MIN( clientScreenshot.width(), m_screenshot.width() ); 
-						mx = MIN( mx, frameBuf.width() );
+						//uint mx = MIN( clientScreenshot.width(), m_screenshot.width() ); 
+						//mx = MIN( mx, frameBuf.width() );
 					
-						uint my = MIN( clientScreenshot.height(), m_screenshot.height() );
-						my = MIN( my, frameBuf.height() );
+						//uint my = MIN( clientScreenshot.height(), m_screenshot.height() );
+						//my = MIN( my, frameBuf.height() );
 
+						/*
 						for ( uint y = 0; y < my; ++y )
 						{
 							const uint8 *pSrc1 = clientScreenshot.get_scanline( y );
@@ -1149,11 +1103,11 @@ public:
 								pDst += 3;
 							}
 						}
-
+						*/
 					}
 					else
 					{
-						frameBuf.blit( 0, 0, (simple_bgr_bitmap &)clientScreenshot, true );
+						//frameBuf.blit( 0, 0, (simple_bgr_bitmap &)clientScreenshot, true );
 					}
 				}
 			}
@@ -1259,7 +1213,7 @@ private:
 	CConCommandConnection m_Clients[cMaxClients];
 	frame_buf_window *m_pFrameBufWindow;
 
-	simple_bitmap m_screenshot;
+	int m_screenshot;
 	int m_nViewEndpointIndex;
 	
 	void AcceptNewConnections()
