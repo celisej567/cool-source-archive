@@ -8,6 +8,7 @@
 4. Compatible with most Source 2013 MP mods.
 5. Can load CS:GO maps and most BSP 21 maps.
 6. DX11 support.
+7. DXVK support (need to copy hl2's dxvk-d3d9.dll in order to work).
 
 # Current state
 Buggy, incomplete and should not be use in production
