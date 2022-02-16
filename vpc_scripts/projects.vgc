@@ -12,23 +12,39 @@ $Project "appframework"
 {
 	"appframework\appframework.vpc" 
 }
+
 $Project "captioncompiler"
 {
-	"utils\captioncompiler\captioncompiler.vpc" [$WIN32]
+	"utils\captioncompiler\captioncompiler.vpc" 
 }
 
 
 $Project "client"
 {
-	"game\client\client_hl2mp.vpc"		[($WIN32||$POSIX) && $HL2MP]
-	"game\client\client_episodic.vpc"	[($WIN32||$POSIX) && $EPISODIC]
-	"game\client\client_hl2.vpc"		[($WIN32||$POSIX) && $HL2]
-	"game\client\client_sdk.vpc"		[($WIN32||$POSIX) && $SDK]
+	"game\client\client_hl2mp.vpc"		[($WIN32||$WIN64||$POSIX) && $HL2MP]
+	"game\client\client_episodic.vpc"	[($WIN32||$WIN64||$POSIX) && $EPISODIC]
+	"game\client\client_hl2.vpc"		[($WIN32||$WIN64||$POSIX) && $HL2]
+	"game\client\client_sdk.vpc"		[($WIN32||$WIN64||$POSIX) && $SDK]
+}
+
+$Project "datamodel"
+{
+	"datamodel\datamodel.vpc"	
+}
+
+$Project "datacache"
+{
+	"datacache\datacache.vpc"	
+}
+
+$Project "dmserializers"
+{
+	"dmserializers\dmserializers.vpc"		
 }
 
 $Project "fgdlib"
 {
-	"fgdlib\fgdlib.vpc" [$WIN32]
+	"fgdlib\fgdlib.vpc" 
 }
 
 $Project "game_shader_dx9"
