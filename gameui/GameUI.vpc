@@ -245,7 +245,7 @@ $Project "GameUI"
 		$Lib	bitmap
 		$Lib	mathlib
 		$Lib	matsys_controls
-		$Lib  	imgui
+		//$Lib  	imgui
 		$Lib	tier2
 		$Lib	tier3
 		$Lib	vgui_controls

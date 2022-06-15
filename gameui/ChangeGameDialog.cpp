@@ -134,7 +134,7 @@ CON_COMMAND(_setgamedir, "Shutdown and restart the engine.")
 {
 	if (args.ArgC() == 2)
 	{
-		SetGameDirectory(args[1]);
+		//SetGameDirectory(args[1]);
 	}
 	else
 	{
