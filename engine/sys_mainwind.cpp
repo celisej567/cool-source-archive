@@ -913,7 +913,7 @@ bool CGame::CreateGameWindow( void )
 	{
 		V_strcat( windowName, " - OpenGL", sizeof( windowName ) );
 	}	
-	else ( IsVulkan() )
+	else if ( IsVulkan() )
 	{
 		V_strcat( windowName, " - Vulkan", sizeof( windowName ) );
 	}

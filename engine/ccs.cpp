@@ -8,7 +8,7 @@
 
 #include "host_state.h"
 
-#define CON_COMMAND_SERVER_SUPPORT
+//#define CON_COMMAND_SERVER_SUPPORT
 
 #include "tier2/tier2.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
